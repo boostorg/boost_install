@@ -1,0 +1,32 @@
+# Generated file. Do not edit.
+
+atomic = headers ;
+chrono = headers system ;
+container = headers ;
+context = headers thread ;
+contract = headers exception thread ;
+coroutine = headers context exception system thread ;
+date_time = headers serialization ;
+exception = headers ;
+fiber = headers context filesystem ;
+filesystem = headers system ;
+graph = headers graph_parallel math random regex serialization test ;
+graph_parallel = headers filesystem graph mpi random serialization ;
+iostreams = headers random regex ;
+locale = headers thread ;
+log = headers atomic container date_time exception filesystem locale random regex system thread ;
+math = headers atomic ;
+mpi = headers graph python serialization ;
+program_options = headers ;
+python = headers graph ;
+random = headers math system ;
+regex = headers ;
+serialization = headers ;
+stacktrace = headers ;
+sync = headers atomic chrono date_time system ;
+system = headers ;
+test = headers exception timer ;
+thread = headers atomic chrono container date_time exception system ;
+timer = headers chrono system ;
+type_erasure = headers thread ;
+wave = headers filesystem serialization ;
