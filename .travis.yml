@@ -1,0 +1,38 @@
+# Copyright 2016-2018 Peter Dimov
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
+
+language: cpp
+
+sudo: false
+
+branches:
+  only:
+    - master
+    - develop
+    - /feature\/.*/
+
+install:
+  - BOOST_BRANCH=feature/cmake-config
+  - cd ..
+  - git clone -b $BOOST_BRANCH https://github.com/boostorg/boost.git boost-root
+  - cd boost-root
+  - git submodule update --init tools/build
+  - git submodule update --init libs/config
+  - mkdir -p tools/cmake_config
+  - cp -r $TRAVIS_BUILD_DIR/* tools/cmake_config
+  - python tools/boostdep/depinst/depinst.py system
+  - ./bootstrap.sh
+
+script:
+  - ./b2 --prefix=~/.local tools/cmake_config//install
+  - ./b2 --prefix=~/.local libs/system/build//install link=static,shared
+  - cd test/system
+  - mkdir __build__ && cd __build__
+  - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+  - cmake --build .
+  - cmake --build . --target check
+
+notifications:
+  email:
+    on_success: always
