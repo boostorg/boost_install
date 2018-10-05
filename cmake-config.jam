@@ -314,6 +314,30 @@ rule generate-cmake-variant ( project name : property-set : sources * )
     return $(result) ;
 }
 
+# deps
+
+local rule deps ( ln )
+{
+    if $(ln) = "prg_exec_monitor" || $(ln) = "test_exec_monitor" || $(ln) = "unit_test_framework"
+    {
+        ln = test ;
+    }
+
+    local r = [ modules.peek cmake-config-dependencies : $(ln) ] ;
+
+    if ! $(r)
+    {
+        ln = [ MATCH "([a-z]+)_.*" : $(ln) ] ;
+
+        if $(ln)
+        {
+            r = [ modules.peek cmake-config-dependencies : $(ln) ] ;
+        }
+    }
+
+    return $(r) ;
+}
+
 # generate-cmake-config-
 
 rule generate-cmake-config- ( target : sources * : properties * )
@@ -401,27 +425,8 @@ rule generate-cmake-config- ( target : sources * : properties * )
         ""
         : true ;
 
-    local ln = $(lname) ;
-
-    if $(ln) = "prg_exec_monitor" || $(ln) = "test_exec_monitor" || $(ln) = "unit_test_framework"
-    {
-        ln = test ;
-    }
-
-    local deps = [ modules.peek cmake-config-dependencies : $(ln) ] ;
-
-    if ! $(deps)
-    {
-        local ln2 = [ MATCH "([a-z]+)_.*" : $(ln) ] ;
-
-        if $(ln2)
-        {
-            ln = $(ln2) ;
-            deps = [ modules.peek cmake-config-dependencies : $(ln) ] ;
-        }
-    }
-
-    .info "  ln=" $(ln) "deps=" $(deps) ;
+    local deps = [ deps $(lname) ] ;
+    .info "  deps=" $(deps) ;
 
     for dep in $(deps)
     {
@@ -549,7 +554,19 @@ rule libs ( target : location : version : name * )
     for nm in $(name)
     {
         configs += [ lib $(location) : $(version) : $(nm) ] ;
+
+        # Add dependencies to libs/$dep/build//$(target)
+
+        local lname = [ MATCH boost_(.*) : $(nm) ] ;
+        local deps = [ deps $(lname) ] ;
+
+        for dep in $(deps)
+        {
+            configs += ../../$(dep)/build//$(target) ;
+        }
     }
+
+    .info "  configs=" $(configs) ;
 
     alias $(target) : $(configs) ;
 }
