@@ -22,6 +22,7 @@ install:
   - git submodule update --init tools/boostdep
   - mkdir -p tools/cmake_config
   - cp -r $TRAVIS_BUILD_DIR/* tools/cmake_config
+  - git submodule update --init libs/system
   - python tools/boostdep/depinst/depinst.py system
   - ./bootstrap.sh
 

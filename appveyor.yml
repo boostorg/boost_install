@@ -21,6 +21,7 @@ install:
   - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\cmake_config\
+  - git submodule update --init libs/system
   - python tools/boostdep/depinst/depinst.py system
   - cmd /c bootstrap
 
