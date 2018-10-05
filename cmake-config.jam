@@ -376,6 +376,7 @@ rule generate-cmake-config- ( target : sources * : properties * )
         ""
         "set_target_properties($(ltarget) PROPERTIES"
         "  INTERFACE_INCLUDE_DIRECTORIES \"\${_IMPORT_PREFIX}/include$(header-subdir)\""
+        "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
         ")"
         ""
         "include(${CMAKE_CURRENT_LIST_DIR}/../BoostDetectToolset-$(version).cmake)"

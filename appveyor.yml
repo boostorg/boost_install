@@ -42,6 +42,7 @@ test_script:
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local ..
   - cmake --build . --config Debug
-  - cmake --build . --config Debug --target check
   - cmake --build . --config Release
+  - PATH %PATH%;C:\projects\.local\lib
+  - cmake --build . --config Debug --target check
   - cmake --build . --config Release --target check
