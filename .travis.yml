@@ -20,6 +20,7 @@ install:
   - git submodule update --init tools/build
   - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
+  - git clone https://github.com/boostorg/headers libs/headers
   - mkdir -p tools/cmake_config
   - cp -r $TRAVIS_BUILD_DIR/* tools/cmake_config
   - git submodule update --init libs/system
@@ -27,7 +28,7 @@ install:
   - ./bootstrap.sh
 
 script:
-  - ./b2 --prefix=$HOME/.local tools/cmake_config/build//install
+  - ./b2 --prefix=$HOME/.local libs/headers/build//install
   - ./b2 --prefix=$HOME/.local libs/system/build//install variant=release link=static,shared
   - cd tools/cmake_config/test/system
   - mkdir __build__ && cd __build__
