@@ -12,6 +12,10 @@ branches:
     - develop
     - /feature\/.*/
 
+env:
+  - LIB=system
+  - LIB=filesystem
+
 install:
   - BOOST_BRANCH=feature/cmake-config
   - cd ..
@@ -23,14 +27,14 @@ install:
   - git clone https://github.com/boostorg/headers libs/headers
   - mkdir -p tools/cmake_config
   - cp -r $TRAVIS_BUILD_DIR/* tools/cmake_config
-  - git submodule update --init libs/system
-  - python tools/boostdep/depinst/depinst.py system
+  - git submodule update --init libs/$LIB
+  - python tools/boostdep/depinst/depinst.py $LIB
   - ./bootstrap.sh
 
 script:
   - ./b2 --prefix=$HOME/.local libs/headers/build//install
-  - ./b2 --prefix=$HOME/.local libs/system/build//install variant=release link=static,shared
-  - cd tools/cmake_config/test/system
+  - ./b2 --prefix=$HOME/.local libs/$LIB/build//install variant=release link=static,shared
+  - cd tools/cmake_config/test/$LIB
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
   - cmake --build .
