@@ -11,14 +11,20 @@ import common ;
 import virtual-target ;
 import print ;
 import os ;
-import cmake-config-dependencies ;
 import feature ;
+import package ;
+import boost-install-dependencies ;
 
 feature.feature library-type : : free ;
 
-if "--debug-cmake-config" in [ modules.peek : ARGV ]
+if "--verbose" in [ modules.peek : ARGV ]
 {
     .info-enabled = 1 ;
+}
+
+if "--debug-boost-install" in [ modules.peek : ARGV ]
+{
+    .debug-enabled = 1 ;
 }
 
 local rule .info ( messages * )
@@ -26,6 +32,14 @@ local rule .info ( messages * )
     if $(.info-enabled)
     {
         ECHO "info:" $(messages) ;
+    }
+}
+
+local rule .debug ( messages * )
+{
+    if $(.debug-enabled)
+    {
+        ECHO "boost-install:" $(messages) ;
     }
 }
 
@@ -278,19 +292,19 @@ rule generate-cmake-variant- ( target : sources * : properties * )
 
 # tag
 
-rule tag ( name : type ? : property-set )
+local rule tag ( name : type ? : property-set )
 {
-    #.info tag $(name) ":" $(type) ":" $(property-set) ;
+    #.debug tag $(name) ":" $(type) ":" $(property-set) ;
 
     local link = [ $(property-set).get <link> ] ;
-    #.info "tag: link is $(link)" ;
+    #.debug "tag: link is $(link)" ;
 
     local r = [ boostcpp.tag $(name) : STATIC_LIB : $(property-set) ] ;
 
     r = $(r:S=$(name:S)) ;
     r = $(r:B=$(r:B)-$(link)) ;
 
-    #.info "tag: returning $(r)" ;
+    #.debug "tag: returning $(r)" ;
 
     return $(r) ;
 }
@@ -299,15 +313,15 @@ rule tag ( name : type ? : property-set )
 
 rule generate-cmake-variant ( project name : property-set : sources * )
 {
-    .info generate-cmake-variant $(name) ;
+    .debug generate-cmake-variant $(name) ;
 
     local tag = [ tag $(name) : : $(property-set) ] ;
 
-    #.info "generate-cmake-variant:" tag is $(tag) ;
+    #.debug "generate-cmake-variant:" tag is $(tag) ;
     
     local result ;
 
-    local a = [ new non-scanning-action : cmake-config.generate-cmake-variant- : $(property-set) ] ;
+    local a = [ new non-scanning-action : boost-install.generate-cmake-variant- : $(property-set) ] ;
     
     result += [ new file-target $(tag) : : $(project) : $(a) ] ;
 
@@ -323,7 +337,7 @@ local rule deps ( ln )
         ln = test ;
     }
 
-    local r = [ modules.peek cmake-config-dependencies : $(ln) ] ;
+    local r = [ modules.peek boost-install-dependencies : $(ln) ] ;
 
     if ! $(r)
     {
@@ -331,7 +345,7 @@ local rule deps ( ln )
 
         if $(ln)
         {
-            r = [ modules.peek cmake-config-dependencies : $(ln) ] ;
+            r = [ modules.peek boost-install-dependencies : $(ln) ] ;
         }
     }
 
@@ -428,7 +442,7 @@ rule generate-cmake-config- ( target : sources * : properties * )
     local deps = [ deps $(lname) ] ;
     .info "  deps=" $(deps) ;
 
-    for dep in $(deps)
+    for local dep in $(deps)
     {
         print.text
 
@@ -443,7 +457,7 @@ rule generate-cmake-config- ( target : sources * : properties * )
 
 rule generate-cmake-config ( project name : property-set : sources * )
 {
-    .info generate-cmake-config $(name) ;
+    .debug generate-cmake-config $(name) ;
 
     local pname = [ $(property-set).get <name> ] ;
     local version = [ $(property-set).get <version> ] ;
@@ -454,7 +468,7 @@ rule generate-cmake-config ( project name : property-set : sources * )
 
     local result ;
 
-    local a = [ new non-scanning-action : cmake-config.generate-cmake-config- : $(ps) ] ;
+    local a = [ new non-scanning-action : boost-install.generate-cmake-config- : $(ps) ] ;
 
     result += [ new file-target $(name) : : $(project) : $(a) ] ;
 
@@ -498,7 +512,7 @@ rule generate-cmake-config-version- ( target : sources * : properties * )
 
 rule generate-cmake-config-version ( project name : property-set : sources * )
 {
-    .info generate-cmake-config-version $(name) ;
+    .debug generate-cmake-config-version $(name) ;
 
     local pname = [ $(property-set).get <name> ] ;
     local version = [ $(property-set).get <version> ] ;
@@ -508,18 +522,18 @@ rule generate-cmake-config-version ( project name : property-set : sources * )
 
     local result ;
 
-    local a = [ new non-scanning-action : cmake-config.generate-cmake-config-version- : $(ps) ] ;
+    local a = [ new non-scanning-action : boost-install.generate-cmake-config-version- : $(ps) ] ;
 
     result += [ new file-target $(name) : : $(project) : $(a) ] ;
 
     return $(result) ;
 }
 
-# lib
+# install-cmake-config-
 
-rule lib ( location : version : name )
+local rule install-cmake-config- ( location : version : name )
 {
-    #.info cmake-config.lib $(name) ;
+    #.debug install-cmake-config- $(name) ;
 
     local loc = $(location)/cmake/$(name)-$(version) ;
 
@@ -545,28 +559,102 @@ rule lib ( location : version : name )
     return $(r) ;
 }
 
-rule libs ( target : location : version : name * )
+# install-cmake-config
+
+rule install-cmake-config ( location : version : name * )
 {
-    .info cmake-config.libs $(name) ;
+    .debug install-cmake-config $(name) ;
 
     local configs ;
 
-    for nm in $(name)
+    for local nm in $(name)
     {
-        configs += [ lib $(location) : $(version) : $(nm) ] ;
-
-        # Add dependencies to libs/$dep/build//$(target)
-
-        local lname = [ MATCH boost_(.*) : $(nm) ] ;
-        local deps = [ deps $(lname) ] ;
-
-        for dep in $(deps)
-        {
-            configs += ../../$(dep)/build//$(target) ;
-        }
+        configs += [ install-cmake-config- $(location) : $(version) : $(nm) ] ;
     }
 
-    .info "  configs=" $(configs) ;
+    .debug "  configs=" $(configs) ;
 
-    alias $(target) : $(configs) ;
+    local p = [ project.current ] ;
+
+    alias install-cmake-config : $(configs) ;
+    $(p).mark-target-as-explicit install-cmake-config ;
+}
+
+# boost-install
+
+rule boost-install ( ROOT : VERSION : libraries * )
+{
+    .debug boost-install $(libraries) ;
+
+    # Compute install-requirements
+
+    local install-requirements ;
+
+    local layout = [ modules.peek boostcpp : layout ] ;
+    local BOOST_VERSION_TAG = [ modules.peek boostcpp : BOOST_VERSION_TAG ] ;
+
+    if $(layout) = versioned
+    {
+        install-requirements += <install-header-subdir>boost-$(BOOST_VERSION_TAG) ;
+    }
+
+    local install-default-prefix ;
+
+    if [ os.name ] = NT
+    {
+        install-default-prefix = C:/Boost ;
+    }
+    else
+    {
+        install-default-prefix = /usr/local ;
+    }
+
+    install-requirements += <install-default-prefix>$(install-default-prefix) ;
+
+    # Target install-libraries
+
+    local p = [ project.current ] ;
+
+    package.install install-libraries boost
+        : $(install-requirements)
+        : # No binaries
+        : $(libraries)
+        : # No headers
+    ;
+
+    $(p).mark-target-as-explicit install-libraries ;
+
+    # Target install-cmake-config
+
+    local prefix = [ option.get prefix : $(install-default-prefix) ] ;
+    local lib-locate = [ option.get libdir : $(prefix)/lib ] ;
+
+    install-cmake-config $(lib-locate) : $(VERSION) : $(libraries) ;
+
+    # Target install-detect-toolset
+
+    install install-detect-toolset : $(ROOT)/tools/boost_install/BoostDetectToolset.cmake : <location>$(lib-locate)/cmake <name>BoostDetectToolset-$(VERSION).cmake ;
+    $(p).mark-target-as-explicit install-detect-toolset ;
+
+    # Gather dependencies
+
+    local deps = ;
+
+    for local lib in $(libraries)
+    {
+        local lname = [ MATCH boost_(.*) : $(lib) ] ;
+        deps += [ deps $(lname) ] ;
+    }
+
+    # Target install
+
+    alias install : install-libraries install-cmake-config install-detect-toolset $(ROOT)/libs/$(deps)/build//install ;
+    $(p).mark-target-as-explicit install ;
+
+    # Target stage
+
+    local stage-locate = [ option.get stagedir : $(ROOT)/stage ] ;
+
+    install stage : $(libraries) : <location>$(stage-locate)/lib ;
+    $(p).mark-target-as-explicit stage ;
 }
