@@ -6,10 +6,13 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigThreadTest LANGUAGES CXX)
 
-find_package(boost_thread 1.69.0 EXACT CONFIG)
+set(THREADS_PREFER_PTHREAD_FLAG 1)
+find_package(Threads REQUIRED)
+
+find_package(boost_thread 1.69.0 EXACT CONFIG REQUIRED)
 
 add_executable(main quick.cpp)
-target_link_libraries(main Boost::thread)
+target_link_libraries(main Boost::thread Threads::Threads)
 
 enable_testing()
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>)
