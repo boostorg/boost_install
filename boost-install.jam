@@ -416,40 +416,47 @@ rule generate-cmake-config- ( target : sources * : properties * )
         "  INTERFACE_INCLUDE_DIRECTORIES \"\${_IMPORT_PREFIX}/include$(header-subdir)\""
         "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
         ")"
-        ""
-        "include(${CMAKE_CURRENT_LIST_DIR}/../BoostDetectToolset-$(version).cmake)"
-        ""
-        "if(Boost_DEBUG)"
-        "  message(STATUS \"Scanning ${CMAKE_CURRENT_LIST_DIR}/lib$(name)-variant*.cmake\")"
-        "endif()"
-        ""
-        "file(GLOB variants \"${CMAKE_CURRENT_LIST_DIR}/lib$(name)-variant*.cmake\")"
-        ""
-        "foreach(f IN LISTS variants)"
-        "  if(Boost_DEBUG)"
-        "    message(STATUS \"  Including ${f}\")"
-        "  endif()"
-        "  include(${f})"
-        "endforeach()"
-        ""
-        "unset(variants)"
-        "unset(_IMPORT_PREFIX)"
-        ""
-        "include(CMakeFindDependencyMacro)"
-        ""
         : true ;
 
-    local deps = [ deps $(lname) ] ;
-    .info "  deps=" $(deps) ;
-
-    for local dep in $(deps)
+    if $(library-type) != INTERFACE
     {
         print.text
 
-        "find_dependency(boost_$(dep) $(version) EXACT)"
-        "set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::$(dep))"
-        ""
-        : true ;
+            ""
+            "include(${CMAKE_CURRENT_LIST_DIR}/../BoostDetectToolset-$(version).cmake)"
+            ""
+            "if(Boost_DEBUG)"
+            "  message(STATUS \"Scanning ${CMAKE_CURRENT_LIST_DIR}/lib$(name)-variant*.cmake\")"
+            "endif()"
+            ""
+            "file(GLOB variants \"${CMAKE_CURRENT_LIST_DIR}/lib$(name)-variant*.cmake\")"
+            ""
+            "foreach(f IN LISTS variants)"
+            "  if(Boost_DEBUG)"
+            "    message(STATUS \"  Including ${f}\")"
+            "  endif()"
+            "  include(${f})"
+            "endforeach()"
+            ""
+            "unset(variants)"
+            "unset(_IMPORT_PREFIX)"
+            ""
+            "include(CMakeFindDependencyMacro)"
+            ""
+            : true ;
+
+        local deps = [ deps $(lname) ] ;
+        .info "  deps=" $(deps) ;
+
+        for local dep in $(deps)
+        {
+            print.text
+
+            "find_dependency(boost_$(dep) $(version) EXACT)"
+            "set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::$(dep))"
+            ""
+            : true ;
+        }
     }
 }
 
@@ -539,7 +546,7 @@ local rule install-cmake-config- ( location : version : name )
 
     local library-type = UNKNOWN ;
 
-    if $(name) = boost_headers || $(name) = boost_math
+    if $(name) = boost_headers || $(name) = boost_math || $(name) = boost_exception
     {
         library-type = INTERFACE ;
     }
