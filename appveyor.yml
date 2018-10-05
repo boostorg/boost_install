@@ -12,6 +12,10 @@ branches:
     - develop
     - /feature\/.*/
 
+environment:
+  - LIB=system
+  - LIB=filesystem
+
 install:
   - set BOOST_BRANCH=feature/cmake-config
   - cd ..
@@ -21,16 +25,16 @@ install:
   - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\cmake_config\
-  - git submodule update --init libs/system
-  - python tools/boostdep/depinst/depinst.py system
+  - git submodule update --init libs/%LIB%
+  - python tools/boostdep/depinst/depinst.py %LIB%
   - cmd /c bootstrap
 
 build: off
 
 test_script:
   - b2 --prefix=C:\projects\.local tools/cmake_config/build//install
-  - b2 --prefix=C:\projects\.local libs/system/build//install link=static,shared
-  - cd tools\cmake_config\test\system
+  - b2 --prefix=C:\projects\.local libs/%LIB%/build//install link=static,shared
+  - cd tools\cmake_config\test\%LIB%
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local ..
   - cmake --build . --config Debug
