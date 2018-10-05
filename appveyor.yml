@@ -16,6 +16,7 @@ environment:
   matrix:
   - LIB: system
   - LIB: filesystem
+  - LIB: thread
 
 install:
   - set BOOST_BRANCH=feature/cmake-config
