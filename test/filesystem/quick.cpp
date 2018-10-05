@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 
-// See library home page at http://www.boost.org/libs/system
+// See library home page at http://www.boost.org/libs/filesystem
 
 #include <boost/filesystem.hpp>
 #include <boost/core/lightweight_test.hpp>
