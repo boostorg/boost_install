@@ -13,6 +13,7 @@ branches:
     - /feature\/.*/
 
 environment:
+  matrix:
   - LIB: system
   - LIB: filesystem
 
