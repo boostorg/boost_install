@@ -26,7 +26,7 @@ matrix:
     - env: LIB=thread
     - env: CHECK_DEPENDENCIES=1 LIB=../tools/boostdep
       script:
-      - ./b2 tools/boostdep/build//install
+      - ./b2 tools/boostdep/build
       - dist/bin/boostdep --list-buildable-dependencies | diff -u tools/boost_install/boost-install-dependencies.jam -
 
 install:
