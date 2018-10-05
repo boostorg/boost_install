@@ -26,7 +26,7 @@ install:
   - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
   - git clone https://github.com/boostorg/headers libs/headers
-  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\cmake_config\
+  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\boost_install\
   - git submodule update --init libs/%LIB%
   - python tools/boostdep/depinst/depinst.py %LIB%
   - cmd /c bootstrap
@@ -34,10 +34,9 @@ install:
 build: off
 
 test_script:
-  - b2 --prefix=C:\projects\.local -d0 libs/headers/build//install
   - b2 -d0 headers
   - b2 --prefix=C:\projects\.local libs/%LIB%/build//install variant=debug,release
-  - cd tools\cmake_config\test\%LIB%
+  - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local ..
   - cmake --build . --config Debug
