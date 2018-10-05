@@ -13,8 +13,8 @@ branches:
     - /feature\/.*/
 
 environment:
-  - LIB=system
-  - LIB=filesystem
+  - LIB: system
+  - LIB: filesystem
 
 install:
   - set BOOST_BRANCH=feature/cmake-config
