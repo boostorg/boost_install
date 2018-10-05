@@ -13,8 +13,21 @@ branches:
     - /feature\/.*/
 
 env:
-  - LIB=system
-  - LIB=filesystem
+  matrix:
+    - BOGUS_JOB=true
+
+matrix:
+  exclude:
+    - env: BOGUS_JOB=true
+
+  include:
+    - env: LIB=system
+    - env: LIB=filesystem
+    - env: LIB=thread
+    - env: CHECK_DEPENDENCIES=1 LIB=../tools/boostdep
+      script:
+      - ./b2 tools/boostdep/build//install
+      - dist/bin/boostdep --list-buildable-dependencies | diff -u tools/boost_install/boost-install-dependencies.jam -
 
 install:
   - BOOST_BRANCH=feature/cmake-config
