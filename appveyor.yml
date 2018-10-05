@@ -37,7 +37,7 @@ test_script:
   - b2 --prefix=C:\projects\.local -d0 tools/cmake_config/build//install
   - b2 -d0 headers
   - b2 --prefix=C:\projects\.local libs/%LIB%/build//install link=static,shared
-  - if NOT "%DEPS%" == "" for %%x in (%DEPS%) do b2 --prefix=C:\projects\.local libs/%%x/build//install link=static,shared
+  - if NOT "%DEPS%" == "" for %%x in (%DEPS%) do b2 --prefix=C:\projects\.local libs/%%x/build//install variant=debug,release
   - cd tools\cmake_config\test\%LIB%
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local ..
