@@ -2,9 +2,9 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
-language: cpp
+version: 1.0.{build}-{branch}
 
-sudo: false
+shallow_clone: true
 
 branches:
   only:
@@ -13,27 +13,24 @@ branches:
     - /feature\/.*/
 
 install:
-  - BOOST_BRANCH=feature/cmake-config
+  - set BOOST_BRANCH=feature/cmake-config
   - cd ..
-  - git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+  - git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
   - git submodule update --init tools/build
   - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
-  - mkdir -p tools/cmake_config
-  - cp -r $TRAVIS_BUILD_DIR/* tools/cmake_config
+  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\cmake_config\
   - python tools/boostdep/depinst/depinst.py system
-  - ./bootstrap.sh
+  - cmd /c bootstrap
 
-script:
-  - ./b2 --prefix=~/.local tools/cmake_config//install
-  - ./b2 --prefix=~/.local libs/system/build//install link=static,shared
-  - cd test/system
+build: off
+
+test_script:
+  - b2 --prefix=C:\projects\.local tools/cmake_config//install
+  - b2 --prefix=C:\projects\.local libs/system/build//install link=static,shared
+  - cd test\system
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local ..
   - cmake --build .
   - cmake --build . --target check
-
-notifications:
-  email:
-    on_success: always
