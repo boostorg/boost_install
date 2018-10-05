@@ -26,7 +26,7 @@ install:
   - ./bootstrap.sh
 
 script:
-  - ./b2 --prefix=~/.local tools/cmake_config//install
+  - ./b2 --prefix=~/.local tools/cmake_config/build//install
   - ./b2 --prefix=~/.local libs/system/build//install link=static,shared
   - cd test/system
   - mkdir __build__ && cd __build__
