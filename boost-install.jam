@@ -570,7 +570,7 @@ local rule install-cmake-config- ( location : version : name )
 
 rule install-cmake-config ( location : version : name * )
 {
-    .debug install-cmake-config $(name) ;
+    #.debug install-cmake-config $(name) ;
 
     local configs ;
 
@@ -578,8 +578,6 @@ rule install-cmake-config ( location : version : name * )
     {
         configs += [ install-cmake-config- $(location) : $(version) : $(nm) ] ;
     }
-
-    .debug "  configs=" $(configs) ;
 
     local p = [ project.current ] ;
 
