@@ -27,6 +27,7 @@ matrix:
     - env: CHECK_DEPENDENCIES=1 LIB=../tools/boostdep
       script:
       - ./b2 tools/boostdep/build
+      - git submodule update --init
       - dist/bin/boostdep --list-buildable-dependencies | diff -u tools/boost_install/boost-install-dependencies.jam -
 
 install:
