@@ -18,6 +18,7 @@ environment:
   - LIB: filesystem
   - LIB: thread
   - LIB: random
+  - LIB: log
 
 install:
   - set BOOST_BRANCH=feature/cmake-config

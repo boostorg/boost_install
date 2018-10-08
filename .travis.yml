@@ -25,6 +25,7 @@ matrix:
     - env: LIB=filesystem
     - env: LIB=thread
     - env: LIB=random
+    - env: LIB=log
     - env: CHECK_DEPENDENCIES=1 LIB=../tools/boostdep
       script:
       - ./b2 tools/boostdep/build
