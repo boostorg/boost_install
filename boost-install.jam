@@ -288,6 +288,17 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         "  )"
         ""
         : true ;
+
+    if $(link) = shared
+    {
+        print.text
+
+        "set_target_properties($(target) PROPERTIES"
+        "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_$(lname:U)_DYN_LINK\""
+        "  )"
+        ""
+        : true ;
+    }
 }
 
 # tag
