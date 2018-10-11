@@ -40,7 +40,6 @@ install:
   - git submodule update --init tools/build
   - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
-  - git clone https://github.com/boostorg/headers libs/headers
   - mkdir -p tools/boost_install
   - cp -r $TRAVIS_BUILD_DIR/* tools/boost_install
   - git submodule update --init libs/$LIB
