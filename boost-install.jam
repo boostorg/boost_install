@@ -469,6 +469,16 @@ rule generate-cmake-config- ( target : sources * : properties * )
             ""
             : true ;
         }
+
+        if $(name) = boost_thread
+        {
+            print.text
+
+            "find_dependency(Threads)"
+            "set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)"
+            ""
+            : true ;
+        }
     }
 }
 

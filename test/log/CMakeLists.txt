@@ -6,13 +6,10 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigLogTest LANGUAGES CXX)
 
-set(THREADS_PREFER_PTHREAD_FLAG 1)
-find_package(Threads REQUIRED)
-
 find_package(boost_log 1.69.0 EXACT CONFIG REQUIRED)
 
 add_executable(main quick.cpp)
-target_link_libraries(main Boost::log Threads::Threads)
+target_link_libraries(main Boost::log)
 
 enable_testing()
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>)
