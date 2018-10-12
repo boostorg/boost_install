@@ -38,10 +38,11 @@ build: off
 
 test_script:
   - b2 -d0 headers
+  - b2 -d0 --prefix=C:\projects\.local --with-headers install
   - b2 --prefix=C:\projects\.local --with-%LIB% install
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local ..
+  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local -DBoost_USE_STATIC_LIBS=ON ..
   - cmake --build . --config Debug
   - cmake --build . --config Release
   - PATH %PATH%;C:\projects\.local\lib
