@@ -13,6 +13,7 @@ import print ;
 import os ;
 import feature ;
 import package ;
+import sequence ;
 import boost-install-dependencies ;
 
 feature.feature library-type : : free ;
@@ -673,6 +674,8 @@ rule boost-install ( ROOT : VERSION : libraries * )
         deps += [ deps $(lname) ] ;
     }
 
+    deps = [ sequence.unique $(deps) ] ;
+
     # Target install
 
     alias install : install-libraries install-cmake-config install-detect-toolset $(ROOT)/libs/$(deps)/build//install ;
@@ -682,6 +685,9 @@ rule boost-install ( ROOT : VERSION : libraries * )
 
     local stage-locate = [ option.get stagedir : $(ROOT)/stage ] ;
 
-    install stage : $(libraries) : <location>$(stage-locate)/lib ;
+    install stage-libraries : $(libraries) : <location>$(stage-locate)/lib ;
+    $(p).mark-target-as-explicit stage-libraries ;
+
+    alias stage : stage-libraries $(ROOT)/libs/$(deps)/build//stage ;
     $(p).mark-target-as-explicit stage ;
 }
