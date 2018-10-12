@@ -95,7 +95,19 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         }
     }
 
-    local fname = [ boostcpp.tag $(name) : $(ftype) : $(ps) ] ;
+    local fname ;
+
+    # Should probably use the <tag> from the target here somehow
+
+    if $(name) = boost_python || $(name) = boost_numpy || $(name) = boost_mpi_python
+    {
+        fname = [ boostcpp.python-tag $(name) : $(ftype) : $(ps) ] ;
+    }
+    else
+    {
+        fname = [ boostcpp.tag $(name) : $(ftype) : $(ps) ] ;
+    }
+
     .info "  fname=" $(fname) ;
 
     print.text
