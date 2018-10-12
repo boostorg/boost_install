@@ -19,6 +19,7 @@ environment:
   - LIB: thread
   - LIB: random
   - LIB: log
+  - LIB: python
 
 install:
   - set BOOST_BRANCH=feature/cmake-config
