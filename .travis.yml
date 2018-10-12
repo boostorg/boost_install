@@ -57,7 +57,7 @@ install:
   - ./bootstrap.sh
 
 script:
-  - ./b2 --prefix=$HOME/.local libs/$LIB/build//install variant=release link=static,shared
+  - ./b2 --prefix=$HOME/.local --with-$LIB install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=~/.local ..

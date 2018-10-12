@@ -38,7 +38,7 @@ build: off
 
 test_script:
   - b2 -d0 headers
-  - b2 --prefix=C:\projects\.local libs/%LIB%/build//install variant=debug,release
+  - b2 --prefix=C:\projects\.local --with-%LIB install
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local ..
