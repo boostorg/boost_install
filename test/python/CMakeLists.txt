@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigPythonTest LANGUAGES CXX)
 
-find_package(Python COMPONENTS Development)
+find_package(Python COMPONENTS Interpreter Development)
 
 find_package(boost_python 1.69.0 EXACT CONFIG)
 
