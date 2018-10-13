@@ -6,11 +6,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigPythonTest LANGUAGES CXX)
 
-if(WIN32)
-  set(Python_ROOT_DIR "C:\\Python27")
-endif()
-
-find_package(Python COMPONENTS Interpreter Development)
+find_package(Python 2.7 COMPONENTS Interpreter Development)
 
 find_package(boost_python 1.69.0 EXACT CONFIG)
 
