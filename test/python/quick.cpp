@@ -6,6 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 
+#if defined(_WIN32)
+# define BOOST_PYTHON_STATIC_LIB
+#endif
 #include <boost/python.hpp>
 #include <boost/core/lightweight_test.hpp>
 
