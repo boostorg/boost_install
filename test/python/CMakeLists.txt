@@ -6,12 +6,12 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigPythonTest LANGUAGES CXX)
 
-find_package(Python 2.7 COMPONENTS Interpreter Development)
-
-find_package(boost_python 1.69.0 EXACT CONFIG)
+find_package(PythonLibs 2.7 REQUIRED)
+find_package(boost_python 1.69.0 EXACT CONFIG REQUIRED)
 
 add_executable(main quick.cpp)
-target_link_libraries(main Boost::python Python::Python)
+target_link_libraries(main Boost::python ${PYTHON_LIBRARIES})
+target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
 
 enable_testing()
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>)
