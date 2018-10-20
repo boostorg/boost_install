@@ -631,7 +631,7 @@ rule install-cmake-config ( location : version : name * )
 
 # boost-install
 
-rule boost-install ( ROOT : VERSION : libraries * )
+rule boost-install ( VERSION : libraries * )
 {
     .debug boost-install $(libraries) ;
 
