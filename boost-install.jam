@@ -14,6 +14,7 @@ import os ;
 import feature ;
 import package ;
 import sequence ;
+import type ;
 import boost-install-dependencies ;
 
 feature.feature library-type : : free ;
@@ -81,33 +82,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     local toolset = [ MATCH ^-(.*) : [ common.format-name <toolset> : "" : "" : $(ps) ] ] ;
     .info "  toolset=" $(toolset) ;
 
-    local ftype = STATIC_LIB ;
-
-    if $(link) = shared
-    {
-        if [ os.name ] = NT
-        {
-            ftype = IMPORT_LIB ;
-        }
-        else
-        {
-            ftype = SHARED_LIB ;
-        }
-    }
-
-    local fname ;
-
-    # Should probably use the <tag> from the target here somehow
-
-    if $(name) = boost_python || $(name) = boost_numpy || $(name) = boost_mpi_python
-    {
-        fname = [ boostcpp.python-tag $(name) : $(ftype) : $(ps) ] ;
-    }
-    else
-    {
-        fname = [ boostcpp.tag $(name) : $(ftype) : $(ps) ] ;
-    }
-
+    local fname = $(sources[1]:BS) ;
     .info "  fname=" $(fname) ;
 
     print.text
@@ -334,20 +309,54 @@ local rule tag ( name : type ? : property-set )
     return $(r) ;
 }
 
+# choose-lib-target: get the import library, if present, the
+#   shared/static library otherwise, ignore .pdb et al
+
+local rule choose-lib-target ( sources * )
+{
+    local result ;
+
+    for local t in $(sources)
+    {
+        if [ type.is-derived [ $(t).type ] IMPORT_LIB ]
+        {
+            return $(t) ;
+        }
+        else if [ type.is-derived [ $(t).type ] LIB ]
+        {
+            result = $(t) ;
+        }
+    }
+
+    return $(result) ;
+}
+
 # generate-cmake-variant
 
 rule generate-cmake-variant ( project name : property-set : sources * )
 {
     .debug generate-cmake-variant $(name) ;
 
+    for local s in $(sources)
+    {
+        .debug "  name=" [ $(s).name ] ;
+    }
+
+    local lib-target = [ choose-lib-target $(sources) ] ;
+
+    if $(lib-target)
+    {
+        .debug "  lib-target=" [ $(lib-target).name ] ;
+    }
+
     local tag = [ tag $(name) : : $(property-set) ] ;
 
     #.debug "generate-cmake-variant:" tag is $(tag) ;
-    
+
     local result ;
 
-    local a = [ new non-scanning-action : boost-install.generate-cmake-variant- : $(property-set) ] ;
-    
+    local a = [ new non-scanning-action $(lib-target) : boost-install.generate-cmake-variant- : $(property-set) ] ;
+
     result += [ new file-target $(tag) : : $(project) : $(a) ] ;
 
     return $(result) ;
