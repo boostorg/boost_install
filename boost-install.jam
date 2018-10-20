@@ -682,7 +682,10 @@ rule boost-install ( ROOT : VERSION : libraries * )
 
     # Target install-detect-toolset
 
-    install install-detect-toolset : $(ROOT)/tools/boost_install/BoostDetectToolset.cmake : <location>$(lib-locate)/cmake <name>BoostDetectToolset-$(VERSION).cmake ;
+    local boost-install-dir = [ modules.binding $(__name__) ] ;
+    boost-install-dir = $(boost-install-dir:D) ;
+
+    install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(lib-locate)/cmake <name>BoostDetectToolset-$(VERSION).cmake ;
     $(p).mark-target-as-explicit install-detect-toolset ;
 
     # Gather dependencies
@@ -699,16 +702,16 @@ rule boost-install ( ROOT : VERSION : libraries * )
 
     # Target install
 
-    alias install : install-libraries install-cmake-config install-detect-toolset $(ROOT)/libs/$(deps)/build//install ;
+    alias install : install-libraries install-cmake-config install-detect-toolset /boost/$(deps)//install ;
     $(p).mark-target-as-explicit install ;
 
     # Target stage
 
-    local stage-locate = [ option.get stagedir : $(ROOT)/stage ] ;
+    local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
 
     install stage-libraries : $(libraries) : <location>$(stage-locate)/lib ;
     $(p).mark-target-as-explicit stage-libraries ;
 
-    alias stage : stage-libraries $(ROOT)/libs/$(deps)/build//stage ;
+    alias stage : stage-libraries /boost/$(deps)//stage ;
     $(p).mark-target-as-explicit stage ;
 }
