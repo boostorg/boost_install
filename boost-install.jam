@@ -291,17 +291,18 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     }
 
 
-    local deps = [ MATCH "boost_(.*)" : [ $(ps).get <boost-install.dependency> ] ] ;
+    local deps = [ MATCH "boost_(.*)" : [ $(ps).get <boost-install.dependency> ] ] headers ;
     .info "  deps=" $(deps) ;
 
-    for local dep in $(deps) headers
+    if $(deps)
     {
         print.text
 
-        "find_dependency(boost_$(dep) $(version) EXACT)"
-        "set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::$(dep))"
-        ""
-        : true ;
+            "set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES_$(variant:U) Boost::$(deps))"
+            ""
+            "list(APPEND BOOST_$(lname:U)_DEPS $(deps:J= ))"
+            ""
+            : true ;
     }
 }
 
@@ -488,8 +489,15 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "  include(${f})"
             "endforeach()"
             ""
+            "list(REMOVE_DUPLICATES BOOST_$(lname:U)_DEPS)"
+            ""
+            "foreach(dep IN LISTS BOOST_$(lname:U)_DEPS")
+            "  find_dependency(${dep})"
+            "endforeach()"
+            ""
             "unset(variants)"
             "unset(_IMPORT_PREFIX)"
+            "unset(BOOST_$(lname:U)_DEPS)"
             ""
             : true ;
 
