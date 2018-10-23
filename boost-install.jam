@@ -599,12 +599,12 @@ local rule install-cmake-config- ( location : version : name )
 
     local r ;
 
-    r += [ generate $(name)-config.cmake : $(name) : <generating-rule>@generate-cmake-config $(reqs) ] ;
-    r += [ generate $(name)-config-version.cmake : $(name) : <generating-rule>@generate-cmake-config-version $(reqs) ] ;
+    r += [ generate $(name)-config.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config $(reqs) ] ;
+    r += [ generate $(name)-config-version.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config-version $(reqs) ] ;
 
     if $(library-type) != INTERFACE
     {
-        r += [ generate $(name)-variant.cmake : $(name) : <generating-rule>@generate-cmake-variant $(reqs) ] ;
+        r += [ generate $(name)-variant.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-variant $(reqs) ] ;
     }
 
     return $(r) ;
