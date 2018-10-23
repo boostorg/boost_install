@@ -14,10 +14,11 @@ import os ;
 import feature ;
 import package ;
 import sequence ;
+import set ;
 import type ;
-import boost-install-dependencies ;
 
 feature.feature library-type : : free ;
+feature.feature boost-install.dependency : : free ;
 
 if "--verbose" in [ modules.peek : ARGV ]
 {
@@ -288,6 +289,20 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         ""
         : true ;
     }
+
+
+    local deps = [ MATCH "boost_(.*)" : [ $(ps).get <boost-install.dependency> ] ] ;
+    .info "  deps=" $(deps) ;
+
+    for local dep in $(deps) headers
+    {
+        print.text
+
+        "find_dependency(boost_$(dep) $(version) EXACT)"
+        "set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::$(dep))"
+        ""
+        : true ;
+    }
 }
 
 # tag
@@ -331,6 +346,26 @@ local rule choose-lib-target ( sources * )
     return $(result) ;
 }
 
+# get-dependency-names: Returns the base names of all
+# dependency libraries.
+#
+local rule get-dependency-names ( sources * )
+{
+    local all-targets = [ collect-targets $(sources) ] ;
+    local lib-names ;
+    for local t in [ set.difference $(all-targets) : $(sources) ]
+    {
+        if [ $(t).type ] && [ type.is-derived [ $(t).type ] LIB ]
+        {
+            # Get back the original unmangled name of the library
+            local subvariant = [ $(t).creating-subvariant ] ;
+            local main-target = [ $(subvariant).main-target ] ;
+            lib-names += [ $(main-target).name ] ;
+        }
+    }
+    return [ sequence.unique $(lib-names) ] ;
+}
+
 # generate-cmake-variant
 
 rule generate-cmake-variant ( project name : property-set : sources * )
@@ -343,6 +378,9 @@ rule generate-cmake-variant ( project name : property-set : sources * )
     }
 
     local lib-target = [ choose-lib-target $(sources) ] ;
+
+    local other-names = [ get-dependency-names $(sources) ] ;
+    property-set = [ $(property-set).add-raw <boost-install.dependency>$(other-names) ] ;
 
     if $(lib-target)
     {
@@ -360,30 +398,6 @@ rule generate-cmake-variant ( project name : property-set : sources * )
     result += [ new file-target $(tag) : : $(project) : $(a) ] ;
 
     return $(result) ;
-}
-
-# deps
-
-local rule deps ( ln )
-{
-    if $(ln) = "prg_exec_monitor" || $(ln) = "test_exec_monitor" || $(ln) = "unit_test_framework"
-    {
-        ln = test ;
-    }
-
-    local r = [ modules.peek boost-install-dependencies : $(ln) ] ;
-
-    if ! $(r)
-    {
-        ln = [ MATCH "([a-z]+)_.*" : $(ln) ] ;
-
-        if $(ln)
-        {
-            r = [ modules.peek boost-install-dependencies : $(ln) ] ;
-        }
-    }
-
-    return $(r) ;
 }
 
 # generate-cmake-config-
@@ -478,19 +492,6 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "include(CMakeFindDependencyMacro)"
             ""
             : true ;
-
-        local deps = [ deps $(lname) ] ;
-        .info "  deps=" $(deps) ;
-
-        for local dep in $(deps)
-        {
-            print.text
-
-            "find_dependency(boost_$(dep) $(version) EXACT)"
-            "set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::$(dep))"
-            ""
-            : true ;
-        }
 
         if $(name) = boost_thread
         {
@@ -629,6 +630,78 @@ rule install-cmake-config ( location : version : name * )
     $(p).mark-target-as-explicit install-cmake-config ;
 }
 
+# collect-targets: Returns the targets and all their dependencies.
+# Copied from stage.jam
+# TODO: Factor this out as a utility in virtal-target.jam
+
+rule collect-targets ( targets * )
+{
+    # Find subvariants
+    local s ;
+    for local t in $(targets)
+    {
+        s += [ $(t).creating-subvariant ] ;
+    }
+    s = [ sequence.unique $(s) ] ;
+
+    local result = [ new set ] ;
+    $(result).add $(targets) ;
+
+    for local i in $(s)
+    {
+        $(i).all-referenced-targets $(result) ;
+    }
+    local result2 ;
+    for local r in [ $(result).list ]
+    {
+        if $(r:G) != <use>
+        {
+            result2 += $(r:G=) ;
+        }
+    }
+    DELETE_MODULE $(result) ;
+    return [ sequence.unique $(result2) ] ;
+}
+
+# get-dependency-projects: Returns all the projects of any dependency of the sources.
+
+rule get-dependency-projects ( sources * )
+{
+    local result ;
+    for local t in [ collect-targets $(sources) ]
+    {
+        result += [ $(t).project ] ;
+    }
+    return [ sequence.unique $(result) ] ;
+}
+
+# generate-dependencies: find and generate the stage and install targets
+# corresponding to the source libraries.
+
+rule generate-dependencies ( project name ? : property-set : sources * )
+{
+    local stage-targets ;
+    local stage-or-install = [ $(property-set).get <name> ] ;
+    local excluded-projects = $(project) [ $(project).find /boost ] ;
+    for local p in [ get-dependency-projects $(sources) ] [ $(project).find /boost/headers ]
+    {
+        if ! ( $(p) in $(excluded-projects) )
+        {
+            stage-targets += [ $(p).find $(stage-or-install) : no-error ] ;
+        }
+    }
+    local props = [ $(property-set).propagated ] ;
+    local result ;
+    local usage-requirements = [ property-set.empty ] ;
+    for local t in $(stage-targets)
+    {
+        local g = [ $(t).generate $(props) ] ;
+        usage-requirements = [ $(usage-requirements).add $(g[1]) ] ;
+        result += $(g[2-]) ;
+    }
+    return $(usage-requirements) $(result) ;
+}
+
 # boost-install
 
 rule boost-install ( VERSION : libraries * )
@@ -688,21 +761,11 @@ rule boost-install ( VERSION : libraries * )
     install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(lib-locate)/cmake <name>BoostDetectToolset-$(VERSION).cmake ;
     $(p).mark-target-as-explicit install-detect-toolset ;
 
-    # Gather dependencies
-
-    local deps = ;
-
-    for local lib in $(libraries)
-    {
-        local lname = [ MATCH boost_(.*) : $(lib) ] ;
-        deps += [ deps $(lname) ] ;
-    }
-
-    deps = [ sequence.unique $(deps) ] ;
-
     # Target install
+    generate install-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>install ;
+    $(p).mark-target-as-explicit install-dependencies ;
 
-    alias install : install-libraries install-cmake-config install-detect-toolset /boost/$(deps)//install ;
+    alias install : install-libraries install-cmake-config install-detect-toolset install-dependencies ;
     $(p).mark-target-as-explicit install ;
 
     # Target stage
@@ -711,7 +774,9 @@ rule boost-install ( VERSION : libraries * )
 
     install stage-libraries : $(libraries) : <location>$(stage-locate)/lib ;
     $(p).mark-target-as-explicit stage-libraries ;
+    generate stage-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>stage ;
+    $(p).mark-target-as-explicit stage-dependencies ;
 
-    alias stage : stage-libraries /boost/$(deps)//stage ;
+    alias stage : stage-libraries stage-dependencies ;
     $(p).mark-target-as-explicit stage ;
 }
