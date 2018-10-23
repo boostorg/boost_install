@@ -492,7 +492,7 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "list(REMOVE_DUPLICATES BOOST_$(lname:U)_DEPS)"
             ""
             "foreach(dep IN LISTS BOOST_$(lname:U)_DEPS")
-            "  find_dependency(${dep})"
+            "  find_dependency(boost_${dep})"
             "endforeach()"
             ""
             "unset(variants)"
