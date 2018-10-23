@@ -479,6 +479,8 @@ rule generate-cmake-config- ( target : sources * : properties * )
             ""
             "file(GLOB variants \"${CMAKE_CURRENT_LIST_DIR}/lib$(name)-variant*.cmake\")"
             ""
+            "include(CMakeFindDependencyMacro)"
+            ""
             "foreach(f IN LISTS variants)"
             "  if(Boost_DEBUG)"
             "    message(STATUS \"  Including ${f}\")"
@@ -488,8 +490,6 @@ rule generate-cmake-config- ( target : sources * : properties * )
             ""
             "unset(variants)"
             "unset(_IMPORT_PREFIX)"
-            ""
-            "include(CMakeFindDependencyMacro)"
             ""
             : true ;
 
