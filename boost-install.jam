@@ -298,8 +298,6 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES_$(variant:U) Boost::$(deps))"
-            ""
             "list(APPEND BOOST_$(lname:U)_DEPS $(deps:J= ))"
             ""
             : true ;
@@ -491,8 +489,9 @@ rule generate-cmake-config- ( target : sources * : properties * )
             ""
             "list(REMOVE_DUPLICATES BOOST_$(lname:U)_DEPS)"
             ""
-            "foreach(dep IN LISTS BOOST_$(lname:U)_DEPS")
-            "  find_dependency(boost_${dep})"
+            "foreach(dep_boost_$(lname) IN LISTS BOOST_$(lname:U)_DEPS")
+            "  find_dependency(boost_${dep_boost_$(lname)})"
+            "  set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::${dep_boost_$(lname)})"
             "endforeach()"
             ""
             "unset(variants)"
