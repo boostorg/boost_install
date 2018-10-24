@@ -27,6 +27,7 @@ matrix:
     - env: LIB=random
     - env: LIB=log
     - env: LIB=python
+    - env: LIB=wave
 
 install:
   - BOOST_BRANCH=feature/cmake-config

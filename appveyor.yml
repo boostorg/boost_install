@@ -20,6 +20,7 @@ environment:
   - LIB: random
   - LIB: log
   - LIB: python
+  - LIB: wave
 
 install:
   - set BOOST_BRANCH=feature/cmake-config
