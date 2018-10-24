@@ -27,20 +27,6 @@ matrix:
     - env: LIB=random
     - env: LIB=log
     - env: LIB=python
-    - env: CHECK_DEPENDENCIES=1
-      install:
-        - BOOST_BRANCH=feature/cmake-config
-        - cd ..
-        - git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
-        - cd boost-root
-        - git submodule update --init
-        - rm -rf tools/boost_install
-        - mkdir -p tools/boost_install
-        - cp -r $TRAVIS_BUILD_DIR/* tools/boost_install
-        - ./bootstrap.sh
-        - ./b2 tools/boostdep/build
-      script:
-        - dist/bin/boostdep --list-buildable-dependencies | diff -u tools/boost_install/boost-install-dependencies.jam -
 
 install:
   - BOOST_BRANCH=feature/cmake-config
