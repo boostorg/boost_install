@@ -21,12 +21,13 @@ matrix:
     - env: BOGUS_JOB=true
 
   include:
-    - env: LIB=system
+    - env: LIB=atomic
     - env: LIB=filesystem
-    - env: LIB=thread
-    - env: LIB=random
     - env: LIB=log
     - env: LIB=python
+    - env: LIB=random
+    - env: LIB=system
+    - env: LIB=thread
     - env: LIB=wave
 
 install:

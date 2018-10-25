@@ -14,12 +14,13 @@ branches:
 
 environment:
   matrix:
-  - LIB: system
+  - LIB: atomic
   - LIB: filesystem
-  - LIB: thread
-  - LIB: random
   - LIB: log
   - LIB: python
+  - LIB: random
+  - LIB: system
+  - LIB: thread
   - LIB: wave
 
 install:
