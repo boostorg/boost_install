@@ -23,6 +23,7 @@ matrix:
   include:
     - env: LIB=atomic
     - env: LIB=chrono
+    - env: LIB=container
     - env: LIB=filesystem
     - env: LIB=log
     - env: LIB=python
@@ -45,6 +46,8 @@ install:
   - git submodule update --init libs/$LIB
   - python tools/boostdep/depinst/depinst.py $LIB
   - ./bootstrap.sh
+  - ./b2 headers
+  - ./b2 --prefix=$HOME/.local --with-headers install
 
 script:
   - ./b2 --prefix=$HOME/.local --with-$LIB install

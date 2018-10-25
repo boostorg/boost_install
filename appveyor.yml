@@ -16,6 +16,7 @@ environment:
   matrix:
   - LIB: atomic
   - LIB: chrono
+  - LIB: container
   - LIB: filesystem
   - LIB: log
   - LIB: python
@@ -37,11 +38,11 @@ install:
   - git submodule update --init libs/%LIB%
   - python tools/boostdep/depinst/depinst.py %LIB%
   - cmd /c bootstrap
+  - b2 -d0 headers
 
 build: off
 
 test_script:
-  - b2 -d0 headers
   - b2 -d0 --prefix=C:\projects\.local --with-headers install
   - b2 --prefix=C:\projects\.local --with-%LIB% install
   - cd tools\boost_install\test\%LIB%
