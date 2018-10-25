@@ -6,6 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 
+// Wave doesn't link on Linux without it
+#define BOOST_WAVE_SEPARATE_LEXER_INSTANTIATION 0
+
 #include <boost/wave.hpp>
 #include <boost/wave/cpplexer/cpp_lex_token.hpp>
 #include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
