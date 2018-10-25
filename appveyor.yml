@@ -15,6 +15,7 @@ branches:
 environment:
   matrix:
   - LIB: atomic
+  - LIB: chrono
   - LIB: filesystem
   - LIB: log
   - LIB: python

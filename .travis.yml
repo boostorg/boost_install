@@ -22,6 +22,7 @@ matrix:
 
   include:
     - env: LIB=atomic
+    - env: LIB=chrono
     - env: LIB=filesystem
     - env: LIB=log
     - env: LIB=python
