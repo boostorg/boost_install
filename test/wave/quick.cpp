@@ -12,6 +12,7 @@
 #include <boost/wave.hpp>
 #include <boost/wave/cpplexer/cpp_lex_token.hpp>
 #include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
+#include <boost/wave/cpplexer/re2clex/cpp_re2c_lexer.hpp>
 #include <iostream>
 
 int main()
