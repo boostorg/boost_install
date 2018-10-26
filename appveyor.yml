@@ -21,6 +21,7 @@ environment:
   - LIB: log
   - LIB: python
   - LIB: random
+  - LIB: regex
   - LIB: system
   - LIB: thread
   - LIB: wave

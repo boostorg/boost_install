@@ -28,6 +28,7 @@ matrix:
     - env: LIB=log
     - env: LIB=python
     - env: LIB=random
+    - env: LIB=regex
     - env: LIB=system
     - env: LIB=thread
     - env: LIB=wave
