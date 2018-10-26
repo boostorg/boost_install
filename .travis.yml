@@ -29,6 +29,7 @@ matrix:
     - env: LIB=python
     - env: LIB=random
     - env: LIB=regex
+    - env: LIB=serialization
     - env: LIB=system
     - env: LIB=thread
     - env: LIB=wave

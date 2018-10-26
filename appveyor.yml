@@ -22,6 +22,7 @@ environment:
   - LIB: python
   - LIB: random
   - LIB: regex
+  - LIB: serialization
   - LIB: system
   - LIB: thread
   - LIB: wave
