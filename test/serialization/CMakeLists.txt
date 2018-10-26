@@ -8,10 +8,16 @@ project(CmakeConfigSerializationTest LANGUAGES CXX)
 
 find_package(boost_serialization 1.69.0 EXACT CONFIG)
 
-add_executable(main quick.cpp)
-target_link_libraries(main Boost::serialization)
+add_executable(quick quick.cpp)
+target_link_libraries(quick Boost::serialization)
+
+find_package(boost_wserialization 1.69.0 EXACT CONFIG)
+
+add_executable(wquick wquick.cpp)
+target_link_libraries(wquick Boost::wserialization)
 
 enable_testing()
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>)
 
-add_test(main main)
+add_test(quick quick)
+add_test(wquick wquick)
