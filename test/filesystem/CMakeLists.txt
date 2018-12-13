@@ -6,7 +6,9 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigFilesystemTest LANGUAGES CXX)
 
-find_package(boost_filesystem 1.69.0 EXACT CONFIG)
+include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
+
+find_package(boost_filesystem ${BOOST_VERSION} EXACT CONFIG)
 
 add_executable(main quick.cpp)
 target_link_libraries(main Boost::filesystem)

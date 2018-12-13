@@ -6,7 +6,9 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigLogTest LANGUAGES CXX)
 
-find_package(boost_log 1.69.0 EXACT CONFIG REQUIRED)
+include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
+
+find_package(boost_log ${BOOST_VERSION} EXACT CONFIG REQUIRED)
 
 add_executable(main quick.cpp)
 target_link_libraries(main Boost::log)

@@ -6,12 +6,14 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigSerializationTest LANGUAGES CXX)
 
-find_package(boost_serialization 1.69.0 EXACT CONFIG)
+include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
+
+find_package(boost_serialization ${BOOST_VERSION} EXACT CONFIG)
 
 add_executable(quick quick.cpp)
 target_link_libraries(quick Boost::serialization)
 
-find_package(boost_wserialization 1.69.0 EXACT CONFIG)
+find_package(boost_wserialization ${BOOST_VERSION} EXACT CONFIG)
 
 add_executable(wquick wquick.cpp)
 target_link_libraries(wquick Boost::wserialization)

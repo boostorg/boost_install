@@ -6,8 +6,10 @@ cmake_minimum_required(VERSION 3.5)
 
 project(CmakeConfigPythonTest LANGUAGES CXX)
 
+include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
+
 find_package(PythonLibs 2.7 REQUIRED)
-find_package(boost_python 1.69.0 EXACT CONFIG REQUIRED)
+find_package(boost_python ${BOOST_VERSION} EXACT CONFIG REQUIRED)
 
 add_executable(main quick.cpp)
 target_link_libraries(main Boost::python ${PYTHON_LIBRARIES})
