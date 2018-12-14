@@ -18,6 +18,7 @@ import set ;
 import type ;
 import path ;
 import regex ;
+import ./boost-install-dirs ;
 
 feature.feature library-type : : free ;
 feature.feature boost-install.dependency : : free ;
@@ -665,18 +666,28 @@ local rule install-cmake-config- ( location : includedir : libdir : version : na
 
 # install-cmake-config
 
-rule install-cmake-config ( location : includedir : libdir : version : name * )
+rule install-cmake-config ( version : name * )
 {
     #.debug install-cmake-config $(name) ;
 
-    includedir = [ path.relative-to [ path.make $(location) ] [ path.make $(includedir) ] ] ;
-    libdir = [ path.relative-to [ path.make $(location) ] [ path.make $(libdir) ] ] ;
+    local includedir = [ boost-install-dirs.includedir ] ;
+    local libdir = [ boost-install-dirs.libdir ] ;
+    local cmakedir = [ boost-install-dirs.cmakedir ] ;
+    local header-subdir = [ boost-install-dirs.header-subdir ] ;
+
+    if $(header-subdir)
+    {
+        includedir = $(includedir)/$(header-subdir) ;
+    }
+
+    includedir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(includedir) ] ] ;
+    libdir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(libdir) ] ] ;
 
     local configs ;
 
     for local nm in $(name)
     {
-        configs += [ install-cmake-config- $(location) : $(includedir) : $(libdir) : $(version) : $(nm) ] ;
+        configs += [ install-cmake-config- $(cmakedir) : $(includedir) : $(libdir) : $(version) : $(nm) ] ;
     }
 
     local p = [ project.current ] ;
@@ -763,39 +774,12 @@ rule boost-install ( VERSION : libraries * )
 {
     .debug boost-install $(libraries) ;
 
-    # Compute install-requirements
-
-    local install-requirements ;
-    local header-subdir = "" ;
-
-    local layout = [ modules.peek boostcpp : layout ] ;
-    local BOOST_VERSION_TAG = [ modules.peek boostcpp : BOOST_VERSION_TAG ] ;
-
-    if $(layout) = versioned
-    {
-        install-requirements += <install-header-subdir>boost-$(BOOST_VERSION_TAG) ;
-        header-subdir = /boost-$(BOOST_VERSION_TAG) ;
-    }
-
-    local install-default-prefix ;
-
-    if [ os.name ] = NT
-    {
-        install-default-prefix = C:/Boost ;
-    }
-    else
-    {
-        install-default-prefix = /usr/local ;
-    }
-
-    install-requirements += <install-default-prefix>$(install-default-prefix) ;
-
     # Target install-libraries
 
     local p = [ project.current ] ;
 
-    package.install install-libraries boost
-        : $(install-requirements)
+    package.install install-libraries Boost
+        : # No requirements
         : # No binaries
         : $(libraries)
         : # No headers
@@ -805,26 +789,14 @@ rule boost-install ( VERSION : libraries * )
 
     # Target install-cmake-config
 
-    # Mirror what package.jam does
-    if [ MATCH --prefix=(.*) : [ modules.peek : ARGV ] ]
-    {
-        option.set cmakedir : ;
-    }
-
-    local prefix = [ option.get prefix : $(install-default-prefix) ] ;
-    #local exec-prefix = [ option.get exec-prefix : $(prefix) ] ;
-    local includedir = [ option.get includedir : $(prefix)/include ] ;
-    local libdir = [ option.get libdir : $(prefix)/lib ] ; # $(exec-prefix) ignored in package.jam too
-    local cmakedir = [ option.get cmakedir : $(libdir)/cmake ] ;
-
-    includedir = $(includedir)$(header-subdir) ;
-
-    install-cmake-config $(cmakedir) : $(includedir) : $(libdir) : $(VERSION) : $(libraries) ;
+    install-cmake-config $(VERSION) : $(libraries) ;
 
     # Target install-detect-toolset
 
     local boost-install-dir = [ modules.binding $(__name__) ] ;
     boost-install-dir = $(boost-install-dir:D) ;
+
+    local cmakedir = [ boost-install-dirs.cmakedir ] ;
 
     install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(VERSION).cmake ;
     $(p).mark-target-as-explicit install-detect-toolset ;

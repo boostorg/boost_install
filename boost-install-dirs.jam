@@ -1,0 +1,126 @@
+# Copyright 2018 Peter Dimov
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
+
+import os ;
+import option ;
+import modules ;
+import boostcpp ;
+
+# default-prefix
+
+rule default-prefix
+{
+    if [ os.name ] = NT
+    {
+        return "C:/Boost" ;
+    }
+    else
+    {
+        return "/usr/local" ;
+    }
+}
+
+# prefix
+
+rule prefix
+{
+    if ! $(.prefix)
+    {
+        # If --prefix is explicitly specified on the command line, ignore
+        # directories that are specified via options in config files.
+
+        if [ MATCH --prefix=(.*) : [ modules.peek : ARGV ] ]
+        {
+            option.set includedir : ;
+            option.set bindir : ;
+            option.set libdir : ;
+            option.set cmakedir : ;
+        }
+
+        .prefix = [ option.get prefix : [ default-prefix ] ] ;
+    }
+
+    return $(.prefix) ;
+}
+
+# exec-prefix
+
+rule exec-prefix
+{
+    if ! $(.exec-prefix)
+    {
+        .exec-prefix = [ option.get exec-prefix : [ prefix ] ] ;
+    }
+
+    return $(.exec-prefix) ;
+}
+
+# includedir
+
+rule includedir
+{
+    if ! $(.includedir)
+    {
+        local prefix = [ prefix ] ;
+        .includedir = [ option.get includedir : $(prefix)/include ] ;
+    }
+
+    return $(.includedir) ;
+}
+
+# bindir
+
+rule bindir
+{
+    if ! $(.bindir)
+    {
+        local exec-prefix = [ exec-prefix ] ;
+        .bindir = [ option.get bindir : $(exec-prefix)/bin ] ;
+    }
+
+    return $(.bindir) ;
+}
+
+# libdir
+
+rule libdir
+{
+    if ! $(.libdir)
+    {
+        local exec-prefix = [ exec-prefix ] ;
+        .libdir = [ option.get libdir : $(exec-prefix)/lib ] ;
+    }
+
+    return $(.libdir) ;
+}
+
+# cmakedir
+
+rule cmakedir
+{
+    if ! $(.cmakedir)
+    {
+        local libdir = [ libdir ] ;
+        .cmakedir = [ option.get cmakedir : $(libdir)/cmake ] ;
+    }
+
+    return $(.cmakedir) ;
+}
+
+# header-subdir
+
+rule header-subdir
+{
+    local r ;
+
+    local layout = [ modules.peek boostcpp : layout ] ;
+
+    if $(layout) = versioned
+    {
+        local BOOST_VERSION_TAG = [ modules.peek boostcpp : BOOST_VERSION_TAG ] ;
+        r = "boost-$(BOOST_VERSION_TAG)" ;
+    }
+
+    return $(r) ;
+}
