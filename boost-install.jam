@@ -8,7 +8,6 @@ import property-set ;
 import "class" : new ;
 import project ;
 import common ;
-import virtual-target ;
 import print ;
 import os ;
 import feature ;
@@ -666,9 +665,11 @@ local rule install-cmake-config- ( location : includedir : libdir : version : na
 
 # install-cmake-config
 
-rule install-cmake-config ( version : name * )
+rule install-cmake-config ( name * )
 {
     #.debug install-cmake-config $(name) ;
+
+    local BOOST_VERSION = [ modules.peek boostcpp : BOOST_VERSION ] ;
 
     local includedir = [ boost-install-dirs.includedir ] ;
     local libdir = [ boost-install-dirs.libdir ] ;
@@ -687,12 +688,22 @@ rule install-cmake-config ( version : name * )
 
     for local nm in $(name)
     {
-        configs += [ install-cmake-config- $(cmakedir) : $(includedir) : $(libdir) : $(version) : $(nm) ] ;
+        configs += [ install-cmake-config- $(cmakedir) : $(includedir) : $(libdir) : $(BOOST_VERSION) : $(nm) ] ;
     }
 
     local p = [ project.current ] ;
 
-    alias install-cmake-config : $(configs) ;
+    # Target install-detect-toolset
+
+    local boost-install-dir = [ modules.binding $(__name__) ] ;
+    boost-install-dir = $(boost-install-dir:D) ;
+
+    install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(BOOST_VERSION).cmake ;
+    $(p).mark-target-as-explicit install-detect-toolset ;
+
+    # Target install-cmake-config
+
+    alias install-cmake-config : $(configs) install-detect-toolset ;
     $(p).mark-target-as-explicit install-cmake-config ;
 }
 
@@ -770,11 +781,11 @@ rule generate-dependencies ( project name ? : property-set : sources * )
 
 # boost-install
 
-rule boost-install ( VERSION : libraries * )
+rule boost-install ( libraries * )
 {
     .debug boost-install $(libraries) ;
 
-    # Target install-libraries
+    # Target install
 
     local p = [ project.current ] ;
 
@@ -787,28 +798,12 @@ rule boost-install ( VERSION : libraries * )
 
     $(p).mark-target-as-explicit install-libraries ;
 
-    # Target install-cmake-config
-
-    install-cmake-config $(VERSION) : $(libraries) ;
-
-    # Target install-detect-toolset
-
-    local boost-install-dir = [ modules.binding $(__name__) ] ;
-    boost-install-dir = $(boost-install-dir:D) ;
-
-    local cmakedir = [ boost-install-dirs.cmakedir ] ;
-
-    install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(VERSION).cmake ;
-    $(p).mark-target-as-explicit install-detect-toolset ;
-
-    # Target install-dependencies
+    install-cmake-config $(libraries) ;
 
     generate install-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>install ;
     $(p).mark-target-as-explicit install-dependencies ;
 
-    # Target install
-
-    alias install : install-libraries install-cmake-config install-detect-toolset install-dependencies ;
+    alias install : install-libraries install-cmake-config install-dependencies ;
     $(p).mark-target-as-explicit install ;
 
     # Target stage
@@ -817,6 +812,7 @@ rule boost-install ( VERSION : libraries * )
 
     install stage-libraries : $(libraries) : <location>$(stage-locate)/lib ;
     $(p).mark-target-as-explicit stage-libraries ;
+
     generate stage-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>stage ;
     $(p).mark-target-as-explicit stage-dependencies ;
 
