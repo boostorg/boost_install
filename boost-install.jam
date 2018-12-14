@@ -16,9 +16,13 @@ import package ;
 import sequence ;
 import set ;
 import type ;
+import path ;
+import regex ;
 
 feature.feature library-type : : free ;
 feature.feature boost-install.dependency : : free ;
+feature.feature boost-install.includedir : : free ;
+feature.feature boost-install.libdir : : free ;
 
 if "--verbose" in [ modules.peek : ARGV ]
 {
@@ -274,7 +278,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         "set_property(TARGET $(target) APPEND PROPERTY IMPORTED_CONFIGURATIONS $(variant:U))"
         "set_target_properties($(target) PROPERTIES"
         "  IMPORTED_LINK_INTERFACE_LANGUAGES_$(variant:U) CXX"
-        "  IMPORTED_LOCATION_$(variant:U) \"${_IMPORT_PREFIX}/lib/$(fname)\""
+        "  IMPORTED_LOCATION_$(variant:U) \"${_BOOST_LIBDIR}/$(fname)\""
         "  )"
         ""
         : true ;
@@ -401,6 +405,32 @@ rule generate-cmake-variant ( project name : property-set : sources * )
 
 # generate-cmake-config-
 
+local rule get-dir ( name : dir )
+{
+    if [ path.is-rooted $(dir) ]
+    {
+        if [ os.name ] = NT
+        {
+            dir = [ path.native $(dir) ] ;
+            dir = [ regex.replace $(dir) \\\\ / ] ;
+        }
+
+        print.text
+
+            "set($(name) \"$(dir)\")"
+
+        : true ;
+    }
+    else
+    {
+        print.text
+
+            "get_filename_component($(name) \"${_BOOST_CMAKEDIR}/$(dir)/\" ABSOLUTE)"
+
+        : true ;
+    }
+}
+
 rule generate-cmake-config- ( target : sources * : properties * )
 {
     .info generate-cmake-config- $(target) ":" $(sources) ;
@@ -418,26 +448,17 @@ rule generate-cmake-config- ( target : sources * : properties * )
     local library-type = [ $(ps).get <library-type> ] ;
     .info "  library-type=" $(library-type) ;
 
+    local includedir = [ $(ps).get <boost-install.includedir> ] ;
+    .info "  includedir=" $(includedir) ;
+
+    local libdir = [ $(ps).get <boost-install.libdir> ] ;
+    .info "  libdir=" $(libdir) ;
+
     local lname = [ MATCH boost_(.*) : $(name) ] ;
     .info "  lname=" $(lname) ;
 
     local ltarget = "Boost::$(lname)" ;
     .info "  ltarget=" $(ltarget) ;
-    
-    local BOOST_VERSION_TAG = [ modules.peek boostcpp : BOOST_VERSION_TAG ] ;
-    .info "  BOOST_VERSION_TAG=" $(BOOST_VERSION_TAG) ;
-
-    local layout = [ modules.peek boostcpp : layout ] ;
-    .info "  layout=" $(layout) ;
-
-    local header-subdir = "" ;
-
-    if $(layout) = versioned
-    {
-        header-subdir = /boost-$(BOOST_VERSION_TAG) ;
-    }
-
-    .info "  header-subdir=" $(header-subdir) ;
 
     print.output $(target) ;
 
@@ -453,14 +474,21 @@ rule generate-cmake-config- ( target : sources * : properties * )
         ""
         "message(STATUS \"Found $(name)\")"
         ""
-        "# Compute the installation prefix relative to this file."
-        "get_filename_component(_IMPORT_PREFIX \"${CMAKE_CURRENT_LIST_DIR}/../../../\" ABSOLUTE)"
+        "# Compute the include and library directories relative to this file."
+        "get_filename_component(_BOOST_CMAKEDIR \"${CMAKE_CURRENT_LIST_DIR}/../\" ABSOLUTE)"
+        : true ;
+
+    get-dir "_BOOST_INCLUDEDIR" : $(includedir) ;
+    get-dir "_BOOST_LIBDIR" : $(libdir) ;
+
+    print.text
+
         ""
         "# Create imported target $(ltarget)"
         "add_library($(ltarget) $(library-type) IMPORTED)"
         ""
         "set_target_properties($(ltarget) PROPERTIES"
-        "  INTERFACE_INCLUDE_DIRECTORIES \"\${_IMPORT_PREFIX}/include$(header-subdir)\""
+        "  INTERFACE_INCLUDE_DIRECTORIES \"\${_BOOST_INCLUDEDIR}\""
         "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
         ")"
         : true ;
@@ -498,6 +526,10 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "endif()"
             ""
             "unset(configs)"
+            "unset(variants)"
+            "unset(_BOOST_LIBDIR)"
+            "unset(_BOOST_INCLUDEDIR)"
+            "unset(_BOOST_CMAKEDIR)"
             ""
             "if(BOOST_$(lname:U)_DEPS)"
             "  list(REMOVE_DUPLICATES BOOST_$(lname:U)_DEPS)"
@@ -508,8 +540,6 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "  set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::${dep_boost_$(lname)})"
             "endforeach()"
             ""
-            "unset(variants)"
-            "unset(_IMPORT_PREFIX)"
             "unset(BOOST_$(lname:U)_DEPS)"
             ""
             : true ;
@@ -536,8 +566,13 @@ rule generate-cmake-config ( project name : property-set : sources * )
     local version = [ $(property-set).get <version> ] ;
     local location = [ $(property-set).get <location> ] ;
     local library-type = [ $(property-set).get <library-type> ] ;
+    local includedir = [ $(property-set).get <boost-install.includedir> ] ;
+    local libdir = [ $(property-set).get <boost-install.libdir> ] ;
 
-    local ps = [ property-set.create <name>$(pname) <version>$(version) <location>$(location) <library-type>$(library-type) ] ;
+    local ps = [ property-set.create
+        <name>$(pname) <version>$(version) <location>$(location)
+        <library-type>$(library-type) <boost-install.includedir>$(includedir)
+        <boost-install.libdir>$(libdir) ] ;
 
     local result ;
 
@@ -604,11 +639,11 @@ rule generate-cmake-config-version ( project name : property-set : sources * )
 
 # install-cmake-config-
 
-local rule install-cmake-config- ( location : version : name )
+local rule install-cmake-config- ( location : includedir : libdir : version : name )
 {
     #.debug install-cmake-config- $(name) ;
 
-    local loc = $(location)/cmake/$(name)-$(version) ;
+    local loc = $(location)/$(name)-$(version) ;
 
     local library-type = UNKNOWN ;
 
@@ -617,7 +652,7 @@ local rule install-cmake-config- ( location : version : name )
         library-type = INTERFACE ;
     }
 
-    local reqs = <name>$(name) <version>$(version) <location>$(loc) <library-type>$(library-type) ;
+    local reqs = <name>$(name) <version>$(version) <location>$(loc) <library-type>$(library-type) <boost-install.includedir>$(includedir) <boost-install.libdir>$(libdir) ;
 
     local r ;
 
@@ -634,15 +669,18 @@ local rule install-cmake-config- ( location : version : name )
 
 # install-cmake-config
 
-rule install-cmake-config ( location : version : name * )
+rule install-cmake-config ( location : includedir : libdir : version : name * )
 {
     #.debug install-cmake-config $(name) ;
+
+    includedir = [ path.relative-to [ path.make $(location) ] [ path.make $(includedir) ] ] ;
+    libdir = [ path.relative-to [ path.make $(location) ] [ path.make $(libdir) ] ] ;
 
     local configs ;
 
     for local nm in $(name)
     {
-        configs += [ install-cmake-config- $(location) : $(version) : $(nm) ] ;
+        configs += [ install-cmake-config- $(location) : $(includedir) : $(libdir) : $(version) : $(nm) ] ;
     }
 
     local p = [ project.current ] ;
@@ -732,6 +770,7 @@ rule boost-install ( VERSION : libraries * )
     # Compute install-requirements
 
     local install-requirements ;
+    local header-subdir = "" ;
 
     local layout = [ modules.peek boostcpp : layout ] ;
     local BOOST_VERSION_TAG = [ modules.peek boostcpp : BOOST_VERSION_TAG ] ;
@@ -739,6 +778,7 @@ rule boost-install ( VERSION : libraries * )
     if $(layout) = versioned
     {
         install-requirements += <install-header-subdir>boost-$(BOOST_VERSION_TAG) ;
+        header-subdir = /boost-$(BOOST_VERSION_TAG) ;
     }
 
     local install-default-prefix ;
@@ -769,22 +809,36 @@ rule boost-install ( VERSION : libraries * )
 
     # Target install-cmake-config
 
-    local prefix = [ option.get prefix : $(install-default-prefix) ] ;
-    local lib-locate = [ option.get libdir : $(prefix)/lib ] ;
+    # Mirror what package.jam does
+    if [ MATCH --prefix=(.*) : [ modules.peek : ARGV ] ]
+    {
+        option.set cmakedir : ;
+    }
 
-    install-cmake-config $(lib-locate) : $(VERSION) : $(libraries) ;
+    local prefix = [ option.get prefix : $(install-default-prefix) ] ;
+    #local exec-prefix = [ option.get exec-prefix : $(prefix) ] ;
+    local includedir = [ option.get includedir : $(prefix)/include ] ;
+    local libdir = [ option.get libdir : $(prefix)/lib ] ; # $(exec-prefix) ignored in package.jam too
+    local cmakedir = [ option.get cmakedir : $(libdir)/cmake ] ;
+
+    includedir = $(includedir)$(header-subdir) ;
+
+    install-cmake-config $(cmakedir) : $(includedir) : $(libdir) : $(VERSION) : $(libraries) ;
 
     # Target install-detect-toolset
 
     local boost-install-dir = [ modules.binding $(__name__) ] ;
     boost-install-dir = $(boost-install-dir:D) ;
 
-    install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(lib-locate)/cmake <name>BoostDetectToolset-$(VERSION).cmake ;
+    install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(VERSION).cmake ;
     $(p).mark-target-as-explicit install-detect-toolset ;
 
-    # Target install
+    # Target install-dependencies
+
     generate install-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>install ;
     $(p).mark-target-as-explicit install-dependencies ;
+
+    # Target install
 
     alias install : install-libraries install-cmake-config install-detect-toolset install-dependencies ;
     $(p).mark-target-as-explicit install ;
