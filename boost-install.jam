@@ -477,13 +477,13 @@ rule generate-cmake-config- ( target : sources * : properties * )
         "  INTERFACE_INCLUDE_DIRECTORIES \"\${_BOOST_INCLUDEDIR}\""
         "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
         ")"
+        ""
         : true ;
 
     if $(library-type) != INTERFACE
     {
         print.text
 
-            ""
             "include(${CMAKE_CURRENT_LIST_DIR}/../BoostDetectToolset-$(version).cmake)"
             ""
             "if(Boost_DEBUG)"
@@ -669,42 +669,55 @@ rule install-cmake-config ( name * )
 {
     #.debug install-cmake-config $(name) ;
 
-    local BOOST_VERSION = [ modules.peek boostcpp : BOOST_VERSION ] ;
-
-    local includedir = [ boost-install-dirs.includedir ] ;
-    local libdir = [ boost-install-dirs.libdir ] ;
-    local cmakedir = [ boost-install-dirs.cmakedir ] ;
-    local header-subdir = [ boost-install-dirs.header-subdir ] ;
-
-    if $(header-subdir)
+    if "--no-cmake-config" in [ modules.peek : ARGV ]
     {
-        includedir = $(includedir)/$(header-subdir) ;
+        local p = [ project.current ] ;
+
+        alias install-detect-toolset ;
+        $(p).mark-target-as-explicit install-detect-toolset ;
+
+        alias install-cmake-config ;
+        $(p).mark-target-as-explicit install-cmake-config ;
     }
-
-    includedir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(includedir) ] ] ;
-    libdir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(libdir) ] ] ;
-
-    local configs ;
-
-    for local nm in $(name)
+    else
     {
-        configs += [ install-cmake-config- $(cmakedir) : $(includedir) : $(libdir) : $(BOOST_VERSION) : $(nm) ] ;
+        local BOOST_VERSION = [ modules.peek boostcpp : BOOST_VERSION ] ;
+
+        local includedir = [ boost-install-dirs.includedir ] ;
+        local libdir = [ boost-install-dirs.libdir ] ;
+        local cmakedir = [ boost-install-dirs.cmakedir ] ;
+        local header-subdir = [ boost-install-dirs.header-subdir ] ;
+
+        if $(header-subdir)
+        {
+            includedir = $(includedir)/$(header-subdir) ;
+        }
+
+        includedir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(includedir) ] ] ;
+        libdir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(libdir) ] ] ;
+
+        local configs ;
+
+        for local nm in $(name)
+        {
+            configs += [ install-cmake-config- $(cmakedir) : $(includedir) : $(libdir) : $(BOOST_VERSION) : $(nm) ] ;
+        }
+
+        local p = [ project.current ] ;
+
+        # Target install-detect-toolset
+
+        local boost-install-dir = [ modules.binding $(__name__) ] ;
+        boost-install-dir = $(boost-install-dir:D) ;
+
+        install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(BOOST_VERSION).cmake ;
+        $(p).mark-target-as-explicit install-detect-toolset ;
+
+        # Target install-cmake-config
+
+        alias install-cmake-config : $(configs) install-detect-toolset ;
+        $(p).mark-target-as-explicit install-cmake-config ;
     }
-
-    local p = [ project.current ] ;
-
-    # Target install-detect-toolset
-
-    local boost-install-dir = [ modules.binding $(__name__) ] ;
-    boost-install-dir = $(boost-install-dir:D) ;
-
-    install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(BOOST_VERSION).cmake ;
-    $(p).mark-target-as-explicit install-detect-toolset ;
-
-    # Target install-cmake-config
-
-    alias install-cmake-config : $(configs) install-detect-toolset ;
-    $(p).mark-target-as-explicit install-cmake-config ;
 }
 
 # collect-targets: Returns the targets and all their dependencies.
