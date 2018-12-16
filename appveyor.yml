@@ -24,6 +24,7 @@ environment:
   - LIB: regex
   - LIB: serialization
   - LIB: system
+  - LIB: test
   - LIB: thread
   - LIB: wave
 

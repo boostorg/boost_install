@@ -31,6 +31,7 @@ matrix:
     - env: LIB=regex
     - env: LIB=serialization
     - env: LIB=system
+    - env: LIB=test
     - env: LIB=thread
     - env: LIB=wave
 
