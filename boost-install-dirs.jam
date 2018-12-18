@@ -2,72 +2,9 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
-import os ;
-import option ;
 import modules ;
 import boostcpp ;
-
-# default-prefix
-
-rule default-prefix
-{
-    if [ os.name ] = NT
-    {
-        return "C:/Boost" ;
-    }
-    else
-    {
-        return "/usr/local" ;
-    }
-}
-
-# prefix
-
-rule prefix
-{
-    if ! $(.prefix)
-    {
-        # If --prefix is explicitly specified on the command line,
-        # ignore dependent directories that are specified via options
-        # in config files.
-
-        if [ MATCH --prefix=(.*) : [ modules.peek : ARGV ] ]
-        {
-            option.set includedir : ;
-            option.set exec-prefix : ;
-            option.set bindir : ;
-            option.set libdir : ;
-            option.set cmakedir : ;
-        }
-
-        .prefix = [ option.get prefix : [ default-prefix ] ] ;
-    }
-
-    return $(.prefix) ;
-}
-
-# exec-prefix
-
-rule exec-prefix
-{
-    if ! $(.exec-prefix)
-    {
-        # If --exec-prefix is explicitly specified on the command line,
-        # ignore dependent directories that are specified via options
-        # in config files.
-
-        if [ MATCH --exec-prefix=(.*) : [ modules.peek : ARGV ] ]
-        {
-            option.set bindir : ;
-            option.set libdir : ;
-            option.set cmakedir : ;
-        }
-
-        .exec-prefix = [ option.get exec-prefix : [ prefix ] ] ;
-    }
-
-    return $(.exec-prefix) ;
-}
+import package ;
 
 # includedir
 
@@ -75,8 +12,8 @@ rule includedir
 {
     if ! $(.includedir)
     {
-        local prefix = [ prefix ] ;
-        .includedir = [ option.get includedir : $(prefix)/include ] ;
+        local paths = [ package.paths Boost ] ;
+        .includedir = [ $(paths).includedir ] ;
     }
 
     return $(.includedir) ;
@@ -88,8 +25,8 @@ rule bindir
 {
     if ! $(.bindir)
     {
-        local exec-prefix = [ exec-prefix ] ;
-        .bindir = [ option.get bindir : $(exec-prefix)/bin ] ;
+        local paths = [ package.paths Boost ] ;
+        .bindir = [ $(paths).bindir ] ;
     }
 
     return $(.bindir) ;
@@ -101,13 +38,8 @@ rule libdir
 {
     if ! $(.libdir)
     {
-        if [ MATCH --libdir=(.*) : [ modules.peek : ARGV ] ]
-        {
-            option.set cmakedir : ;
-        }
-
-        local exec-prefix = [ exec-prefix ] ;
-        .libdir = [ option.get libdir : $(exec-prefix)/lib ] ;
+        local paths = [ package.paths Boost ] ;
+        .libdir = [ $(paths).libdir ] ;
     }
 
     return $(.libdir) ;
@@ -119,8 +51,10 @@ rule cmakedir
 {
     if ! $(.cmakedir)
     {
-        local libdir = [ libdir ] ;
-        .cmakedir = [ option.get cmakedir : $(libdir)/cmake ] ;
+        package.add-path-option cmakedir : cmake : libdir ;
+
+        local paths = [ package.paths Boost ] ;
+        .cmakedir = [ $(paths).get cmakedir ] ;
     }
 
     return $(.cmakedir) ;
