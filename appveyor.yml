@@ -29,7 +29,8 @@ environment:
   - LIB: wave
 
 install:
-  - set BOOST_BRANCH=feature/cmake-config
+  - set BOOST_BRANCH=develop
+  - if "%APPVEYOR_REPO_BRANCH%" == "master" set BOOST_BRANCH=master
   - cd ..
   - git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
