@@ -503,8 +503,6 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "  list(APPEND skipped \"${fname} (${reason})\")"
             "endmacro()"
             ""
-            "include(CMakeFindDependencyMacro)"
-            ""
             "foreach(f IN LISTS variants)"
             "  if(Boost_DEBUG)"
             "    message(STATUS \"  Including ${f}\")"
@@ -528,7 +526,6 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "unset(variants)"
             "unset(_BOOST_LIBDIR)"
             "unset(_BOOST_INCLUDEDIR)"
-            "unset(_BOOST_CMAKEDIR)"
             ""
             "if(BOOST_$(lname:U)_DEPS)"
             "  list(REMOVE_DUPLICATES BOOST_$(lname:U)_DEPS)"
@@ -536,10 +533,22 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "endif()"
             ""
             "foreach(dep_boost_$(lname) IN LISTS BOOST_$(lname:U)_DEPS")
-            "  find_dependency(boost_${dep_boost_$(lname)})"
+            "  set(_BOOST_QUIET)"
+            "  if(boost_$(lname)_FIND_QUETLY)"
+            "    set(_BOOST_QUIET QUIET)"
+            "  endif()"
+            "  set(_BOOST_REQUIRED)"
+            "  if(boost_$(lname)_FIND_REQUIRED)"
+            "    set(_BOOST_REQUIRED REQUIRED)"
+            "  endif()"
+            "  get_filename_component(_BOOST_CMAKEDIR \"${CMAKE_CURRENT_LIST_DIR}/../\" ABSOLUTE)"
+            "  find_package(boost_${dep_boost_$(lname)} $(version) EXACT ${_BOOST_REQUIRED} ${_BOOST_QUIET} HINTS ${_BOOST_CMAKEDIR})"
             "  set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::${dep_boost_$(lname)})"
             "endforeach()"
             ""
+            "unset(_BOOST_QUIET)"
+            "unset(_BOOST_REQUIRED)"
+            "unset(_BOOST_CMAKEDIR)"
             "unset(BOOST_$(lname:U)_DEPS)"
             ""
             : true ;
@@ -548,6 +557,7 @@ rule generate-cmake-config- ( target : sources * : properties * )
         {
             print.text
 
+            "include(CMakeFindDependencyMacro)"
             "find_dependency(Threads)"
             "set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)"
             ""
