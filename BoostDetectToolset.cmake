@@ -1,4 +1,4 @@
-# Copyright 2017, 2018 Peter Dimov
+# Copyright 2017-2019 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -83,7 +83,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
 
 elseif(MSVC)
 
-  if(MSVC_VERSION EQUAL 1910)
+  if((MSVC_VERSION GREATER 1909) AND (MSVC_VERSION LESS 1920))
 
     set(BOOST_DETECTED_TOOLSET "vc141")
 
@@ -128,16 +128,6 @@ elseif(MSVC)
   set(_BOOST_COMPILER_VERSION_MAJOR)
   set(_BOOST_COMPILER_VERSION_MINOR)
 
-else()
-
-  # Unknown toolset
-
-  if(Boost_DEBUG)
-    message(STATUS "BoostDetectToolset: unknown compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
-  endif()
-
-  return()
-
 endif()
 
 # Add version
@@ -148,6 +138,13 @@ unset(_BOOST_COMPILER_VERSION)
 unset(_BOOST_COMPILER_VERSION_MAJOR)
 unset(_BOOST_COMPILER_VERSION_MINOR)
 
-if(Boost_DEBUG)
+if("${BOOST_DETECTED_TOOLSET}" STREQUAL "")
+
+  # Unknown toolset
+  message(STATUS "Boost toolset is unknown (compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION})")
+
+elseif(Boost_DEBUG)
+
   message(STATUS "Boost toolset is ${BOOST_DETECTED_TOOLSET} (${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION})")
+
 endif()
