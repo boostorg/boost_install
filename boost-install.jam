@@ -750,9 +750,22 @@ rule install-cmake-config ( name * )
         install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(BOOST_VERSION).cmake ;
         $(p).mark-target-as-explicit install-detect-toolset ;
 
+        # Target install-boost-config
+
+        install install-boost-config : $(boost-install-dir)/BoostConfig.cmake : <location>$(cmakedir)/Boost-$(BOOST_VERSION) ;
+        $(p).mark-target-as-explicit install-boost-config ;
+
+        # Target install-boost-config-version
+
+        generate BoostConfigVersion.cmake : : <generating-rule>@boost-install%generate-cmake-config-version <name>Boost <version>$(BOOST_VERSION) <location>$(cmakedir)/Boost-$(BOOST_VERSION) ;
+        $(p).mark-target-as-explicit BoostConfigVersion.cmake ;
+
+        alias install-boost-config-version : BoostConfigVersion.cmake ;
+        $(p).mark-target-as-explicit install-boost-config-version ;
+
         # Target install-cmake-config
 
-        alias install-cmake-config : $(configs) install-detect-toolset ;
+        alias install-cmake-config : $(configs) install-detect-toolset install-boost-config install-boost-config-version ;
         $(p).mark-target-as-explicit install-cmake-config ;
     }
 }
