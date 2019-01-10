@@ -1,4 +1,4 @@
-# Copyright 2016-2018 Peter Dimov
+# Copyright 2016-2019 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -34,13 +34,11 @@ install:
   - cd ..
   - git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
-  - git submodule update --init tools/build
-  - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
-  - git submodule update --init libs/headers
-  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\boost_install\
   - git submodule update --init libs/%LIB%
   - python tools/boostdep/depinst/depinst.py %LIB%
+  - rd /s/q tools\boost_install
+  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\boost_install\
   - cmd /c bootstrap
   - b2 -d0 headers
 
