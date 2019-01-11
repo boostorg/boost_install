@@ -47,14 +47,14 @@ install:
 build: off
 
 test_script:
-  - b2 -d0 --prefix=C:\projects\.local --with-headers install
-  - b2 --prefix=C:\projects\.local --with-%LIB% install
+  - b2 -d0 --with-headers install
+  - b2 --with-%LIB% install
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
   - if "%UBP%" == "" SET UBP=0
-  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local -DUSE_BOOST_PACKAGE=%UBP% ..
+  - cmake -DUSE_BOOST_PACKAGE=%UBP% ..
   - cmake --build . --config Debug
   - cmake --build . --config Release
-  - PATH %PATH%;C:\projects\.local\lib
+  - PATH %PATH%;C:\Boost\lib
   - cmake --build . --config Debug --target check
   - cmake --build . --config Release --target check
