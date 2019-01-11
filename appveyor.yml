@@ -15,6 +15,8 @@ branches:
 environment:
   matrix:
   - LIB: atomic
+  - LIB: atomic
+    UBP: 1
   - LIB: chrono
   - LIB: container
   - LIB: filesystem
@@ -49,7 +51,8 @@ test_script:
   - b2 --prefix=C:\projects\.local --with-%LIB% install
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local ..
+  - if "%UBP%" == "" SET UBP=0
+  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local -DUSE_BOOST_PACKAGE=%UBP% ..
   - cmake --build . --config Debug
   - cmake --build . --config Release
   - PATH %PATH%;C:\projects\.local\lib
