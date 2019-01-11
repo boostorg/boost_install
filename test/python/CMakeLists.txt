@@ -1,4 +1,4 @@
-# Copyright 2018 Peter Dimov
+# Copyright 2018, 2019 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -9,7 +9,16 @@ project(CmakeConfigPythonTest LANGUAGES CXX)
 include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
 
 find_package(PythonLibs 2.7 REQUIRED)
-find_package(boost_python ${BOOST_VERSION} EXACT CONFIG REQUIRED)
+
+if(USE_BOOST_PACKAGE)
+
+  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS python)
+
+else()
+
+  find_package(boost_python ${BOOST_VERSION} EXACT CONFIG REQUIRED)
+
+endif()
 
 add_executable(main quick.cpp)
 target_link_libraries(main Boost::python ${PYTHON_LIBRARIES})

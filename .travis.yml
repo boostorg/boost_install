@@ -26,17 +26,29 @@ matrix:
     - env: LIB=atomic
     - env: LIB=atomic UBP=1
     - env: LIB=chrono
+    - env: LIB=chrono UBP=1
     - env: LIB=container
+    - env: LIB=container UBP=1
     - env: LIB=filesystem
+    - env: LIB=filesystem UBP=1
     - env: LIB=log
+    - env: LIB=log UBP=1
     - env: LIB=python
+    - env: LIB=python UBP=1
     - env: LIB=random
+    - env: LIB=random UBP=1
     - env: LIB=regex
+    - env: LIB=regex UBP=1
     - env: LIB=serialization
+    - env: LIB=serialization UBP=1
     - env: LIB=system
+    - env: LIB=system UBP=1
     - env: LIB=test
+    - env: LIB=test UBP=1
     - env: LIB=thread
+    - env: LIB=thread UBP=1
     - env: LIB=wave
+    - env: LIB=wave UBP=1
 
 install:
   - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true

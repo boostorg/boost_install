@@ -1,4 +1,4 @@
-# Copyright 2018 Peter Dimov
+# Copyright 2018, 2019 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -8,12 +8,19 @@ project(CmakeConfigSerializationTest LANGUAGES CXX)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
 
-find_package(boost_serialization ${BOOST_VERSION} EXACT CONFIG)
+if(USE_BOOST_PACKAGE)
+
+  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS serialization wserialization)
+
+else()
+
+  find_package(boost_serialization ${BOOST_VERSION} EXACT CONFIG)
+  find_package(boost_wserialization ${BOOST_VERSION} EXACT CONFIG)
+
+endif()
 
 add_executable(quick quick.cpp)
 target_link_libraries(quick Boost::serialization)
-
-find_package(boost_wserialization ${BOOST_VERSION} EXACT CONFIG)
 
 add_executable(wquick wquick.cpp)
 target_link_libraries(wquick Boost::wserialization)

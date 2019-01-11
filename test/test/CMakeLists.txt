@@ -1,4 +1,4 @@
-# Copyright 2018 Peter Dimov
+# Copyright 2018, 2019 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -8,12 +8,19 @@ project(CmakeConfigTestTest LANGUAGES CXX)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
 
-find_package(boost_prg_exec_monitor ${BOOST_VERSION} EXACT CONFIG)
+if(USE_BOOST_PACKAGE)
+
+  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS prg_exec_monitor unit_test_framework)
+
+else()
+
+  find_package(boost_prg_exec_monitor ${BOOST_VERSION} EXACT CONFIG)
+  find_package(boost_unit_test_framework ${BOOST_VERSION} EXACT CONFIG)
+
+endif()
 
 add_executable(test_mon test_mon.cpp)
 target_link_libraries(test_mon Boost::prg_exec_monitor)
-
-find_package(boost_unit_test_framework ${BOOST_VERSION} EXACT CONFIG)
 
 add_executable(test_utf test_utf.cpp)
 target_link_libraries(test_utf Boost::unit_test_framework)
