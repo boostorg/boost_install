@@ -14,8 +14,8 @@ if(USE_BOOST_PACKAGE)
 
 else()
 
-  find_package(boost_prg_exec_monitor ${BOOST_VERSION} EXACT CONFIG)
-  find_package(boost_unit_test_framework ${BOOST_VERSION} EXACT CONFIG)
+  find_package(boost_prg_exec_monitor ${BOOST_VERSION} EXACT CONFIG REQUIRED)
+  find_package(boost_unit_test_framework ${BOOST_VERSION} EXACT CONFIG REQUIRED)
 
 endif()
 
