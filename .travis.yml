@@ -23,14 +23,36 @@ matrix:
     - env: BOGUS_JOB=true
 
   include:
+
+    # find_package(boost_filesystem)
+    - env: LIB=filesystem
+    - env: LIB=filesystem
+      os: osx
+
+    # find_package(Boost COMPONENTS filesystem)
+    - env: LIB=filesystem UBP=1
+    - env: LIB=filesystem UBP=1
+      os: osx
+
+    # --layout=versioned
+    - env: LIB=filesystem LAYOUT=versioned
+    - env: LIB=filesystem LAYOUT=versioned TOOLSET=clang
+      os: osx
+
+    # build with g++, use with clang++
+    - env: LIB=filesystem
+      compiler: clang++
+
+    # build with clang++, use with g++
+    - env: LIB=filesystem TOOLSET=clang
+
+    # other libraries
     - env: LIB=atomic
     - env: LIB=atomic UBP=1
     - env: LIB=chrono
     - env: LIB=chrono UBP=1
     - env: LIB=container
     - env: LIB=container UBP=1
-    - env: LIB=filesystem
-    - env: LIB=filesystem UBP=1
     - env: LIB=log
     - env: LIB=log UBP=1
     - env: LIB=python
@@ -49,10 +71,6 @@ matrix:
     - env: LIB=thread UBP=1
     - env: LIB=wave
     - env: LIB=wave UBP=1
-    - env: LIB=filesystem
-      os: osx
-    - env: LIB=filesystem UBP=1
-      os: osx
 
 install:
   - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
@@ -66,10 +84,10 @@ install:
   - cp -r $TRAVIS_BUILD_DIR/* tools/boost_install
   - ./bootstrap.sh
   - ./b2 headers
-  - ./b2 --prefix=$HOME/.local --with-headers install
+  - ./b2 --prefix=$HOME/.local --with-headers ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} install
 
 script:
-  - ./b2 --prefix=$HOME/.local --with-$LIB install
+  - ./b2 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} ..
