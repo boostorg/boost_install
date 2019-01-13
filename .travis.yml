@@ -49,6 +49,10 @@ matrix:
     - env: LIB=thread UBP=1
     - env: LIB=wave
     - env: LIB=wave UBP=1
+    - env: LIB=filesystem
+      os: osx
+    - env: LIB=filesystem UBP=1
+      os: osx
 
 install:
   - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
