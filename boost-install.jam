@@ -471,7 +471,7 @@ rule generate-cmake-config- ( target : sources * : properties * )
         "  return()"
         "endif()"
         ""
-        "message(STATUS \"Found $(name)\")"
+        "message(STATUS \"Found $(name) ${$(name)_VERSION} at ${$(name)_DIR}\")"
         ""
         "# Compute the include and library directories relative to this file."
         "get_filename_component(_BOOST_CMAKEDIR \"${CMAKE_CURRENT_LIST_DIR}/../\" ABSOLUTE)"
