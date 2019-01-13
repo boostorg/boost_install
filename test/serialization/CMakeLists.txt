@@ -14,8 +14,8 @@ if(USE_BOOST_PACKAGE)
 
 else()
 
-  find_package(boost_serialization ${BOOST_VERSION} EXACT CONFIG)
-  find_package(boost_wserialization ${BOOST_VERSION} EXACT CONFIG)
+  find_package(boost_serialization ${BOOST_VERSION} EXACT CONFIG REQUIRED)
+  find_package(boost_wserialization ${BOOST_VERSION} EXACT CONFIG REQUIRED)
 
 endif()
 

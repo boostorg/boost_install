@@ -14,7 +14,7 @@ if(USE_BOOST_PACKAGE)
 
 else()
 
-  find_package(boost_filesystem ${BOOST_VERSION} EXACT CONFIG)
+  find_package(boost_filesystem ${BOOST_VERSION} EXACT CONFIG REQUIRED)
 
 endif()
 
