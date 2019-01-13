@@ -96,14 +96,14 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         ""
         : true ;
 
-    print.text "# variant=$(variant)" "" : true ;
+    print.text "# address-model=$(address-model)" "" : true ;
 
-    if $(variant) = debug
+    if $(address-model) = 32
     {
         print.text
 
-            "if(NOT \"${Boost_USE_DEBUG_LIBS}\" STREQUAL \"\" AND NOT Boost_USE_DEBUG_LIBS)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"debug, Boost_USE_DEBUG_LIBS=${Boost_USE_DEBUG_LIBS}\")"
+            "if(CMAKE_SIZEOF_VOID_P EQUAL 8)"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"32 bit, need 64\")"
             "  return()"
             "endif()"
             ""
@@ -113,14 +113,30 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "if(NOT \"${Boost_USE_RELEASE_LIBS}\" STREQUAL \"\" AND NOT Boost_USE_RELEASE_LIBS)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"release, Boost_USE_RELEASE_LIBS=${Boost_USE_RELEASE_LIBS}\")"
+            "if(CMAKE_SIZEOF_VOID_P EQUAL 4)"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"64 bit, need 32\")"
             "  return()"
             "endif()"
             ""
             : true ;
     }
-    
+
+    print.text "# toolset=$(toolset)" "" : true ;
+
+    print.text
+
+        "if(Boost_COMPILER AND NOT Boost_COMPILER STREQUAL \"$(toolset)\")"
+        "  _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), Boost_COMPILER=${Boost_COMPILER}\")"
+        "  return()"
+        "endif()"
+        ""
+        "if(BOOST_DETECTED_TOOLSET AND NOT BOOST_DETECTED_TOOLSET STREQUAL \"$(toolset)\")"
+        "  _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), detected ${BOOST_DETECTED_TOOLSET}, set Boost_COMPILER to override\")"
+        "  return()"
+        "endif()"
+        ""
+        : true ;
+
     print.text "# link=$(link)" "" : true ;
 
     if $(link) = static
@@ -208,14 +224,14 @@ rule generate-cmake-variant- ( target : sources * : properties * )
 |#
     print.text "# threading=$(threading)" "" : true ;
 
-    print.text "# address-model=$(address-model)" "" : true ;
+    print.text "# variant=$(variant)" "" : true ;
 
-    if $(address-model) = 32
+    if $(variant) = debug
     {
         print.text
 
-            "if(CMAKE_SIZEOF_VOID_P EQUAL 8)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"32 bit, need 64\")"
+            "if(NOT \"${Boost_USE_DEBUG_LIBS}\" STREQUAL \"\" AND NOT Boost_USE_DEBUG_LIBS)"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"debug, Boost_USE_DEBUG_LIBS=${Boost_USE_DEBUG_LIBS}\")"
             "  return()"
             "endif()"
             ""
@@ -225,28 +241,16 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "if(CMAKE_SIZEOF_VOID_P EQUAL 4)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"64 bit, need 32\")"
+            "if(NOT \"${Boost_USE_RELEASE_LIBS}\" STREQUAL \"\" AND NOT Boost_USE_RELEASE_LIBS)"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"release, Boost_USE_RELEASE_LIBS=${Boost_USE_RELEASE_LIBS}\")"
             "  return()"
             "endif()"
             ""
             : true ;
     }
 
-    print.text "# toolset=$(toolset)" "" : true ;
-
     print.text
 
-        "if(Boost_COMPILER AND NOT Boost_COMPILER STREQUAL \"$(toolset)\")"
-        "  _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), Boost_COMPILER=${Boost_COMPILER}\")"
-        "  return()"
-        "endif()"
-        ""
-        "if(BOOST_DETECTED_TOOLSET AND NOT BOOST_DETECTED_TOOLSET STREQUAL \"$(toolset)\")"
-        "  _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), detected ${BOOST_DETECTED_TOOLSET}, set Boost_COMPILER to override\")"
-        "  return()"
-        "endif()"
-        ""
         "message(STATUS \"  $(fname)\")"
         ""
         : true ;
@@ -279,7 +283,6 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         ""
         : true ;
     }
-
 
     local deps = [ MATCH "boost_(.*)" : [ $(ps).get <boost-install.dependency> ] ] headers ;
     .info "  deps=" $(deps) ;
