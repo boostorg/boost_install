@@ -39,8 +39,17 @@ matrix:
     - env: LIB=filesystem LAYOUT=versioned TOOLSET=clang
       os: osx
 
+    # --layout=tagged
+    - env: LIB=filesystem LAYOUT=tagged
+    - env: LIB=filesystem LAYOUT=tagged
+      os: osx
+
     # build with g++, use with clang++
     - env: LIB=filesystem
+      compiler: clang++
+
+    # same, with tagged layout
+    - env: LIB=filesystem LAYOUT=tagged
       compiler: clang++
 
     # build with clang++, use with g++
