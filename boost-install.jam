@@ -206,13 +206,13 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     }
 
     print.text "# runtime-debugging=$(runtime-debugging)" "" : true ;
-#|
+
     if $(runtime-debugging) = "on"
     {
         print.text
 
-            "if(NOT Boost_USE_DEBUG_RUNTIME)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"debug runtime, Boost_USE_DEBUG_RUNTIME not ON\")"
+            "if(NOT \"${Boost_USE_DEBUG_RUNTIME}\" STREQUAL \"\" AND NOT Boost_USE_DEBUG_RUNTIME)"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"debug runtime, Boost_USE_DEBUG_RUNTIME=${Boost_USE_DEBUG_RUNTIME}\")"
             "  return()"
             "endif()"
             ""
@@ -223,13 +223,13 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         print.text
 
             "if(Boost_USE_DEBUG_RUNTIME)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"debug runtime, Boost_USE_DEBUG_RUNTIME=${Boost_USE_DEBUG_RUNTIME}\")"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"release runtime, Boost_USE_DEBUG_RUNTIME=${Boost_USE_DEBUG_RUNTIME}\")"
             "  return()"
             "endif()"
             ""
             : true ;
     }
-|#
+
     print.text "# threading=$(threading)" "" : true ;
 
     print.text "# variant=$(variant)" "" : true ;
