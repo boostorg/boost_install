@@ -55,6 +55,16 @@ matrix:
     # build with clang++, use with g++
     - env: LIB=filesystem TOOLSET=clang
 
+    # same, with tagged layout
+    - env: LIB=filesystem TOOLSET=clang LAYOUT=tagged
+
+    # build with both gcc and clang, use with gcc
+    - env: LIB=filesystem LAYOUT=versioned TOOLSET=gcc,clang
+
+    # build with both gcc and clang, use with clang
+    - env: LIB=filesystem LAYOUT=versioned TOOLSET=gcc,clang
+      compiler: clang++
+
     # other libraries
     - env: LIB=atomic
     - env: LIB=atomic UBP=1
