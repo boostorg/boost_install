@@ -59,8 +59,8 @@ build: off
 test_script:
   - if not "%LAYOUT%" == "" SET LAYOUT=--layout=%LAYOUT%
   - if not "%TOOLSET%" == "" SET TOOLSET=toolset=%TOOLSET%
-  - b2 -d0 --prefix=C:\projects\.local --with-headers %TOOLSET% %LAYOUT% install
-  - b2 --prefix=C:\projects\.local --with-%LIB% %TOOLSET% %LAYOUT% install
+  - b2 -j3 -d0 --prefix=C:\projects\.local --with-headers %TOOLSET% %LAYOUT% install
+  - b2 -j3 --prefix=C:\projects\.local --with-%LIB% %TOOLSET% %LAYOUT% install
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
   - if "%UBP%" == "" SET UBP=0
