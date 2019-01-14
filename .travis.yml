@@ -97,7 +97,7 @@ install:
   - git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
   - git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/$LIB
-  - python tools/boostdep/depinst/depinst.py -X test -G "--jobs 3" $LIB
+  - python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" $LIB
   - rm -rf tools/boost_install/*
   - cp -r $TRAVIS_BUILD_DIR/* tools/boost_install
   - ./bootstrap.sh
