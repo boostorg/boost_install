@@ -60,8 +60,8 @@ install:
   - cd ..
   - git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
-  - git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/$LIB
-  - python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" $LIB
+  - git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/%LIB%
+  - python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" %LIB%
   - rd /s/q tools\boost_install
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\boost_install\
   - cmd /c bootstrap
