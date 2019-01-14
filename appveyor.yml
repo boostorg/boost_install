@@ -12,31 +12,21 @@ branches:
     - develop
     - /feature\/.*/
 
+image: Visual Studio 2017
+
 environment:
   matrix:
-  - LIB: atomic
-  - LIB: atomic
-    UBP: 1
-  - LIB: chrono
-  - LIB: chrono
-    UBP: 1
-  - LIB: container
-  - LIB: container
-    UBP: 1
   - LIB: filesystem
   - LIB: filesystem
     UBP: 1
+  - LIB: filesystem
+    LAYOUT: tagged
+    TOOLSET: msvc-14.0
   - LIB: log
   - LIB: log
     UBP: 1
   - LIB: python
   - LIB: python
-    UBP: 1
-  - LIB: random
-  - LIB: random
-    UBP: 1
-  - LIB: regex
-  - LIB: regex
     UBP: 1
   - LIB: serialization
   - LIB: serialization
@@ -49,9 +39,6 @@ environment:
     UBP: 1
   - LIB: thread
   - LIB: thread
-    UBP: 1
-  - LIB: wave
-  - LIB: wave
     UBP: 1
 
 install:
@@ -70,8 +57,10 @@ install:
 build: off
 
 test_script:
-  - b2 -d0 --prefix=C:\projects\.local --with-headers install
-  - b2 --prefix=C:\projects\.local --with-%LIB% install
+  - if not "%LAYOUT%" == "" SET LAYOUT=--layout=%LAYOUT%
+  - if not "%TOOLSET%" == "" SET TOOLSET=toolset=%TOOLSET%
+  - b2 -d0 --prefix=C:\projects\.local --with-headers %TOOLSET% %LAYOUT% install
+  - b2 --prefix=C:\projects\.local --with-%LIB% %TOOLSET% %LAYOUT% install
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
   - if "%UBP%" == "" SET UBP=0
