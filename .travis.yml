@@ -98,7 +98,7 @@ install:
   - cd boost-root
   - git submodule update --init tools/boostdep
   - git submodule update --init libs/$LIB
-  - python tools/boostdep/depinst/depinst.py $LIB
+  - python tools/boostdep/depinst/depinst.py -X test $LIB
   - rm -rf tools/boost_install/*
   - cp -r $TRAVIS_BUILD_DIR/* tools/boost_install
   - ./bootstrap.sh
