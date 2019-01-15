@@ -23,23 +23,13 @@ environment:
     LAYOUT: tagged
     TOOLSET: msvc-14.0
   - LIB: log
-  - LIB: log
-    UBP: 1
   - LIB: python
-  - LIB: python
-    UBP: 1
-  - LIB: serialization
   - LIB: serialization
     UBP: 1
   - LIB: system
-  - LIB: system
-    UBP: 1
-  - LIB: test
   - LIB: test
     UBP: 1
   - LIB: thread
-  - LIB: thread
-    UBP: 1
 
 install:
   - set BOOST_BRANCH=develop
