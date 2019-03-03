@@ -17,19 +17,27 @@ image: Visual Studio 2017
 environment:
   matrix:
   - LIB: filesystem
+    TOOLSET: msvc-14.1
   - LIB: filesystem
     UBP: 1
+    TOOLSET: msvc-14.1
   - LIB: filesystem
     LAYOUT: tagged
     TOOLSET: msvc-14.0
   - LIB: log
+    TOOLSET: msvc-14.1
   - LIB: python
+    TOOLSET: msvc-14.1
   - LIB: serialization
     UBP: 1
+    TOOLSET: msvc-14.1
   - LIB: system
+    TOOLSET: msvc-14.1
   - LIB: test
     UBP: 1
+    TOOLSET: msvc-14.1
   - LIB: thread
+    TOOLSET: msvc-14.1
 
 install:
   - set BOOST_BRANCH=develop
