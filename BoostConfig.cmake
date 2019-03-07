@@ -2,6 +2,41 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
+# This CMake configuration file, installed as part of the Boost build
+# and installation procedure done by `b2 install`, provides support
+# for find_package(Boost).
+#
+# It's roughly, but not perfectly, compatible with the behavior
+# of find_package(Boost) as provided by FindBoost.cmake.
+#
+# A typical use might be
+#
+# find_package(Boost 1.70 REQUIRED COMPONENTS filesystem regex PATHS C:/Boost)
+#
+# On success, the above invocation would define the targets Boost::headers,
+# Boost::filesystem and Boost::regex. Boost::headers represents all
+# header-only libraries. An alias, Boost::boost, for Boost::headers is
+# provided for compatibility.
+#
+# Since Boost libraries can coexist in many variants - 32/64 bit,
+# static/dynamic runtime, debug/release, the following variables can be used
+# to control which variant is chosen:
+#
+# Boost_USE_DEBUG_LIBS:     When OFF, disables debug libraries.
+# Boost_USE_RELEASE_LIBS:   When OFF, disables release libraries.
+# Boost_USE_STATIC_LIBS:    When ON, uses static Boost libraries; when OFF,
+#                           uses shared Boost libraries; when not set, the
+#                           default is to use shared when BUILD_SHARED_LIBS is
+#                           ON, static otherwise.
+# Boost_USE_STATIC_RUNTIME: When ON, uses Boost libraries linked against the
+#                           static runtime. The default is shared runtime.
+# Boost_USE_DEBUG_RUNTIME:  When ON, uses Boost libraries linked against the
+#                           debug runtime. When OFF, against the release
+#                           runtime. The default is to use either.
+# Boost_COMPILER:           The compiler that has been used to build Boost,
+#                           such as vc141, gcc7, clang37. The default is
+#                           determined from CMAKE_CXX_COMPILER_ID.
+
 message(STATUS "Found Boost ${Boost_VERSION} at ${Boost_DIR}")
 
 # Output requested configuration (f.ex. "REQUIRED COMPONENTS filesystem")
