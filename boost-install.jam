@@ -882,12 +882,15 @@ rule boost-install ( libraries * )
 
     local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
 
-    install stage-libraries : $(libraries) : <location>$(stage-locate)/lib ;
-    $(p).mark-target-as-explicit stage-libraries ;
+    install stage-libraries-static : $(libraries) : <location>$(stage-locate)/lib <install-dependencies>on <install-type>STATIC_LIB ;
+    $(p).mark-target-as-explicit stage-libraries-static ;
+
+    install stage-libraries-shared : $(libraries) : <location>$(stage-locate)/lib <install-dependencies>on <install-type>SHARED_LIB ;
+    $(p).mark-target-as-explicit stage-libraries-shared ;
 
     generate stage-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>stage ;
     $(p).mark-target-as-explicit stage-dependencies ;
 
-    alias stage : stage-libraries stage-dependencies ;
+    alias stage : stage-libraries-static stage-libraries-shared stage-dependencies ;
     $(p).mark-target-as-explicit stage ;
 }
