@@ -60,6 +60,8 @@ build: off
 test_script:
   - if not "%LAYOUT%" == "" SET LAYOUT=--layout=%LAYOUT%
   - if not "%TOOLSET%" == "" SET TOOLSET=toolset=%TOOLSET%
+  - set ZLIB_SOURCE=%CD%\tools\boost_install\test\iostreams\zlib-1.2.11
+  - set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.6
   - b2 -j3 -d0 --prefix=C:\projects\.local --with-headers %TOOLSET% %LAYOUT% install
   - b2 -j3 --prefix=C:\projects\.local --with-%LIB% %TOOLSET% %LAYOUT% install
   - cd tools\boost_install\test\%LIB%
