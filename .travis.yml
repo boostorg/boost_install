@@ -72,6 +72,8 @@ matrix:
     - env: LIB=chrono UBP=1
     - env: LIB=container
     - env: LIB=container UBP=1
+    - env: LIB=iostreams
+    - env: LIB=iostreams UBP=1
     - env: LIB=log
     - env: LIB=log UBP=1
     - env: LIB=python
