@@ -299,7 +299,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "list(APPEND _BOOST_$(lname:U)_DEPS $(deps:J= ))"
+            "list(APPEND _BOOST_$(lname:U)_DEPS $(deps:S=:J= ))"
             ""
             : true ;
     }
