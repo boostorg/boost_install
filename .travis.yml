@@ -107,7 +107,13 @@ install:
   - ./b2 -j3 --prefix=$HOME/.local --with-headers ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} install
 
 script:
-  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} install
+  - |-
+    echo "using python : 2.7 ;" >> ~/user-config.jam
+  - |-
+    echo "using python : 3.6 ;" >> ~/user-config.jam
+  - |-
+    echo "using python : 3.7 ;" >> ~/user-config.jam
+  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} python=2.7,3.6,3.7 install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} ..
