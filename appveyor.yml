@@ -56,11 +56,11 @@ install:
   - cmd /c bootstrap
   - set USER_CONFIG=%HOMEDRIVE%%HOMEPATH%\user-config.jam
   - |-
-    echo "using python : 2.7 : C:/Python27 ;" >> %USER_CONFIG%
+    echo using python : 2.7 : C:/Python27 ; >> %USER_CONFIG%
   - |-
-    echo "using python : 3.6 : C:/Python36 ;" >> %USER_CONFIG%
+    echo using python : 3.6 : C:/Python36 ; >> %USER_CONFIG%
   - |-
-    echo "using python : 3.7 : C:/Python37 ;" >> %USER_CONFIG%
+    echo using python : 3.7 : C:/Python37 ; >> %USER_CONFIG%
   - b2 -d0 headers
 
 build: off
