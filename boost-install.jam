@@ -269,11 +269,18 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     local target = "Boost::$(lname)" ;
     .info "  target=" $(target) ;
 
-    print.text "# Target file name: $(fname)" : true ;
+    print.text "# Target file name: $(fname)" "" : true ;
 
     print.text
 
+        "get_target_property(__boost_imploc $(target) IMPORTED_LOCATION_$(variant:U))"
+        "if(__boost_imploc)"
+        "  message(WARNING \"Target $(target) already has an imported location '${__boost_imploc}', which will be overwritten with '${_BOOST_LIBDIR}/$(fname)'\")"
+        "endif()"
+        "unset(__boost_imploc)"
+        ""
         "set_property(TARGET $(target) APPEND PROPERTY IMPORTED_CONFIGURATIONS $(variant:U))"
+        ""
         "set_target_properties($(target) PROPERTIES"
         "  IMPORTED_LINK_INTERFACE_LANGUAGES_$(variant:U) CXX"
         "  IMPORTED_LOCATION_$(variant:U) \"${_BOOST_LIBDIR}/$(fname)\""
