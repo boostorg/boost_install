@@ -124,6 +124,35 @@ rule generate-cmake-variant- ( target : sources * : properties * )
             : true ;
     }
 
+    local python ;
+
+    local relevant = [ $(ps).get <relevant> ] ;
+    relevant = [ feature.expand-relevant $(relevant) ] ;
+
+    if python in $(relevant)
+    {
+        python = [ $(ps).get <python> ] ;
+    }
+
+    if $(python)
+    {
+        .info "  python=" $(python) ;
+
+        print.text "# python=$(python)" "" : true ;
+
+        print.text
+
+            "if(Boost_PYTHON_VERSION)"
+            "  string(REGEX REPLACE \"([0-9]+[.][0-9]+)([.].*)?\" \"\\\\1\" __boost_pyver ${Boost_PYTHON_VERSION})"
+            "  if(NOT __boost_pyver VERSION_EQUAL \"$(python)\")"
+            "    _BOOST_SKIPPED(\"$(fname)\" \"$(python), Boost_PYTHON_VERSION=${Boost_PYTHON_VERSION}\")"
+            "    return()"
+            "  endif()"
+            "endif()"
+            ""
+            : true ;
+    }
+
     print.text "# layout=$(layout)" "" : true ;
 
     print.text "# toolset=$(toolset)" "" : true ;
