@@ -53,6 +53,10 @@ install:
   - rd /s/q tools\boost_install
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\boost_install\
   - cmd /c bootstrap
+  - set USER_CONFIG=%HOMEDRIVE%%HOMEPATH%\user-config.jam
+  - echo "using python : 2.7 ;" >> %USER_CONFIG%
+  - echo "using python : 3.6 ;" >> %USER_CONFIG%
+  - echo "using python : 3.7 ;" >> %USER_CONFIG%
   - b2 -d0 headers
 
 build: off
@@ -60,10 +64,11 @@ build: off
 test_script:
   - if not "%LAYOUT%" == "" SET LAYOUT=--layout=%LAYOUT%
   - if not "%TOOLSET%" == "" SET TOOLSET=toolset=%TOOLSET%
+  - set PYTHON=python=2.7,3.6,3.7
   - set ZLIB_SOURCE=%CD%\tools\boost_install\test\iostreams\zlib-1.2.11
   - set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.6
-  - b2 -j3 -d0 --prefix=C:\projects\.local --with-headers %TOOLSET% %LAYOUT% install
-  - b2 -j3 --prefix=C:\projects\.local --with-%LIB% %TOOLSET% %LAYOUT% install
+  - b2 -j3 -d0 --prefix=C:\projects\.local --with-headers %TOOLSET% %LAYOUT% %PYTHON% install
+  - b2 -j3 --prefix=C:\projects\.local --with-%LIB% %TOOLSET% %LAYOUT% %PYTHON% install
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
   - if "%UBP%" == "" SET UBP=0
