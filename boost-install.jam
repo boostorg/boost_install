@@ -313,17 +313,33 @@ actions generate-cmake-variant-
 
 local rule tag ( name : type ? : property-set )
 {
-    #.debug tag $(name) ":" $(type) ":" $(property-set) ;
+    .debug tag $(name) ;
 
     local link = [ $(property-set).get <link> ] ;
-    #.debug "tag: link is $(link)" ;
+    .debug "  link=" $(link) ;
+
+    local python = ;
+
+    local relevant = [ $(property-set).get <relevant> ] ;
+    relevant = [ feature.expand-relevant $(relevant) ] ;
+
+    if python in $(relevant)
+    {
+        python = [ $(property-set).get <python> ] ;
+        .debug "  python=" $(python) ;
+    }
 
     local r = [ boostcpp.tag $(name) : STATIC_LIB : $(property-set) ] ;
 
     r = $(r:S=$(name:S)) ;
     r = $(r:B=$(r:B)-$(link)) ;
 
-    #.debug "tag: returning $(r)" ;
+    if $(python)
+    {
+        r = $(r:B=$(r:B)-py$(python)) ;
+    }
+
+    .debug "  result=" $(r) ;
 
     return $(r) ;
 }
