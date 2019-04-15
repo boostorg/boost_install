@@ -31,6 +31,7 @@ environment:
     TOOLSET: msvc-14.1
   - LIB: python
     TOOLSET: msvc-14.1
+    PYTHON: 2.7,3.6,3.7
   - LIB: serialization
     UBP: 1
     TOOLSET: msvc-14.1
@@ -54,9 +55,9 @@ install:
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% tools\boost_install\
   - cmd /c bootstrap
   - set USER_CONFIG=%HOMEDRIVE%%HOMEPATH%\user-config.jam
-  - echo "using python : 2.7 ;" >> %USER_CONFIG%
-  - echo "using python : 3.6 ;" >> %USER_CONFIG%
-  - echo "using python : 3.7 ;" >> %USER_CONFIG%
+  - echo "using python : 2.7 : C:/Python27 ;" >> %USER_CONFIG%
+  - echo "using python : 3.6 : C:/Python36 ;" >> %USER_CONFIG%
+  - echo "using python : 3.7 : C:/Python37 ;" >> %USER_CONFIG%
   - b2 -d0 headers
 
 build: off
@@ -64,7 +65,7 @@ build: off
 test_script:
   - if not "%LAYOUT%" == "" SET LAYOUT=--layout=%LAYOUT%
   - if not "%TOOLSET%" == "" SET TOOLSET=toolset=%TOOLSET%
-  - set PYTHON=python=2.7,3.6,3.7
+  - if not "%PYTHON%" == "" SET PYTHON=python=%PYTHON%
   - set ZLIB_SOURCE=%CD%\tools\boost_install\test\iostreams\zlib-1.2.11
   - set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.6
   - b2 -j3 -d0 --prefix=C:\projects\.local --with-headers %TOOLSET% %LAYOUT% %PYTHON% install
