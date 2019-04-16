@@ -36,6 +36,9 @@
 # Boost_COMPILER:           The compiler that has been used to build Boost,
 #                           such as vc141, gcc7, clang37. The default is
 #                           determined from CMAKE_CXX_COMPILER_ID.
+# Boost_PYTHON_VERSION:     The version of Python against which Boost.Python
+#                           has been built; only required when more than one
+#                           Boost.Python library is present.
 
 message(STATUS "Found Boost ${Boost_VERSION} at ${Boost_DIR}")
 
