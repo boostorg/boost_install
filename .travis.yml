@@ -77,7 +77,7 @@ matrix:
     - env: LIB=log
     - env: LIB=log UBP=1
     - env: LIB=python PYTHON=2.7
-    - env: LIB=python UBP=1 PYTHON=3.5
+    - env: LIB=python UBP=1
     - env: LIB=random
     - env: LIB=random UBP=1
     - env: LIB=regex
@@ -109,9 +109,7 @@ install:
 script:
   - |-
     echo "using python : 2.7 ;" >> ~/user-config.jam
-  - |-
-    echo "using python : 3.5 ;" >> ~/user-config.jam
-  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${PYTHON:+python=$PYTHON --debug-configuration} install
+  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${PYTHON:+python=$PYTHON} install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
   - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} ..
