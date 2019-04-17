@@ -451,7 +451,11 @@ rule generate-cmake-variant ( project name : property-set : sources * )
         result += [ new file-target $(tag) : : $(project) : $(a) ] ;
     }
 
-    return $(result) ;
+    # The result is an optional property set, the usage requirements,
+    # followed by a list of targets. When the list is empty, we need
+    # to include the property set, to avoid a warning.
+
+    return [ property-set.empty ] $(result) ;
 }
 
 # generate-cmake-config-
