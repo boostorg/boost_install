@@ -438,20 +438,18 @@ rule generate-cmake-variant ( project name : property-set : sources * )
     local other-names = [ get-dependency-names $(sources) ] ;
     property-set = [ $(property-set).add-raw <boost-install.dependency>$(other-names) ] ;
 
+    local result ;
+
     if $(lib-target)
     {
         .debug "  lib-target=" [ $(lib-target).name ] ;
+
+        local tag = [ tag $(name) : : $(property-set) ] ;
+
+        local a = [ new non-scanning-action $(lib-target) : boost-install.generate-cmake-variant- : $(property-set) ] ;
+
+        result += [ new file-target $(tag) : : $(project) : $(a) ] ;
     }
-
-    local tag = [ tag $(name) : : $(property-set) ] ;
-
-    #.debug "generate-cmake-variant:" tag is $(tag) ;
-
-    local result ;
-
-    local a = [ new non-scanning-action $(lib-target) : boost-install.generate-cmake-variant- : $(property-set) ] ;
-
-    result += [ new file-target $(tag) : : $(project) : $(a) ] ;
 
     return $(result) ;
 }
