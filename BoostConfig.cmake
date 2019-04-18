@@ -39,42 +39,51 @@
 # Boost_PYTHON_VERSION:     The version of Python against which Boost.Python
 #                           has been built; only required when more than one
 #                           Boost.Python library is present.
+#
+# The following variables control the verbosity of the output:
+#
+# Boost_VERBOSE:            Enable verbose output
+# Boost_DEBUG:              Enable debug (even more verbose) output
 
-message(STATUS "Found Boost ${Boost_VERSION} at ${Boost_DIR}")
+if(Boost_VERBOSE OR Boost_DEBUG)
 
-# Output requested configuration (f.ex. "REQUIRED COMPONENTS filesystem")
+  message(STATUS "Found Boost ${Boost_VERSION} at ${Boost_DIR}")
 
-if(Boost_FIND_QUIETLY)
-  set(_BOOST_CONFIG "${_BOOST_CONFIG} QUIET")
-endif()
+  # Output requested configuration (f.ex. "REQUIRED COMPONENTS filesystem")
 
-if(Boost_FIND_REQUIRED)
-  set(_BOOST_CONFIG "${_BOOST_CONFIG} REQUIRED")
-endif()
-
-foreach(__boost_comp IN LISTS Boost_FIND_COMPONENTS)
-  if(${Boost_FIND_REQUIRED_${__boost_comp}})
-    list(APPEND _BOOST_COMPONENTS ${__boost_comp})
-  else()
-    list(APPEND _BOOST_OPTIONAL_COMPONENTS ${__boost_comp})
+  if(Boost_FIND_QUIETLY)
+    set(_BOOST_CONFIG "${_BOOST_CONFIG} QUIET")
   endif()
-endforeach()
 
-if(_BOOST_COMPONENTS)
-  set(_BOOST_CONFIG "${_BOOST_CONFIG} COMPONENTS ${_BOOST_COMPONENTS}")
+  if(Boost_FIND_REQUIRED)
+    set(_BOOST_CONFIG "${_BOOST_CONFIG} REQUIRED")
+  endif()
+
+  foreach(__boost_comp IN LISTS Boost_FIND_COMPONENTS)
+    if(${Boost_FIND_REQUIRED_${__boost_comp}})
+      list(APPEND _BOOST_COMPONENTS ${__boost_comp})
+    else()
+      list(APPEND _BOOST_OPTIONAL_COMPONENTS ${__boost_comp})
+    endif()
+  endforeach()
+
+  if(_BOOST_COMPONENTS)
+    set(_BOOST_CONFIG "${_BOOST_CONFIG} COMPONENTS ${_BOOST_COMPONENTS}")
+  endif()
+
+  if(_BOOST_OPTIONAL_COMPONENTS)
+    set(_BOOST_CONFIG "${_BOOST_CONFIG} OPTIONAL_COMPONENTS ${_BOOST_OPTIONAL_COMPONENTS}")
+  endif()
+
+  if(_BOOST_CONFIG)
+    message(STATUS "  Requested configuration:${_BOOST_CONFIG}")
+  endif()
+
+  unset(_BOOST_CONFIG)
+  unset(_BOOST_COMPONENTS)
+  unset(_BOOST_OPTIONAL_COMPONENTS)
+
 endif()
-
-if(_BOOST_OPTIONAL_COMPONENTS)
-  set(_BOOST_CONFIG "${_BOOST_CONFIG} OPTIONAL_COMPONENTS ${_BOOST_OPTIONAL_COMPONENTS}")
-endif()
-
-if(_BOOST_CONFIG)
-  message(STATUS "  Requested configuration:${_BOOST_CONFIG}")
-endif()
-
-unset(_BOOST_CONFIG)
-unset(_BOOST_COMPONENTS)
-unset(_BOOST_OPTIONAL_COMPONENTS)
 
 # find_dependency doesn't forward arguments until 3.9, so we have to roll our own
 

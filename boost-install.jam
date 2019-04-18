@@ -288,7 +288,9 @@ rule generate-cmake-variant- ( target : sources * : properties * )
 
     print.text
 
-        "message(STATUS \"  $(fname)\")"
+        "if(Boost_VERBOSE OR Boost_DEBUG)"
+        "  message(STATUS \"  $(fname)\")"
+        "endif()"
         ""
         : true ;
 
@@ -525,7 +527,9 @@ rule generate-cmake-config- ( target : sources * : properties * )
         "  return()"
         "endif()"
         ""
-        "message(STATUS \"Found $(name) ${$(name)_VERSION} at ${$(name)_DIR}\")"
+        "if(Boost_VERBOSE OR Boost_DEBUG)"
+        "  message(STATUS \"Found $(name) ${$(name)_VERSION} at ${$(name)_DIR}\")"
+        "endif()"
         ""
         "# Compute the include and library directories relative to this file."
         "get_filename_component(_BOOST_CMAKEDIR \"${CMAKE_CURRENT_LIST_DIR}/../\" ABSOLUTE)"
@@ -580,8 +584,10 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "get_target_property(__boost_configs $(ltarget) IMPORTED_CONFIGURATIONS)"
             ""
             "if(__boost_variants AND NOT __boost_configs)"
-            "  message(STATUS \"No suitable $(name) variant has been identified!\")"
-            "  if(NOT Boost_DEBUG)"
+            "  if(Boost_VERBOSE OR Boost_DEBUG)"
+            "    message(STATUS \"No suitable $(name) variant has been identified!\")"
+            "  endif()"
+            "  if(Boost_VERBOSE AND NOT Boost_DEBUG)"
             "    foreach(s IN LISTS __boost_skipped)"
             "      message(STATUS \"  ${s}\")"
             "    endforeach()"
@@ -601,7 +607,9 @@ rule generate-cmake-config- ( target : sources * : properties * )
             ""
             "if(_BOOST_$(lname:U)_DEPS)"
             "  list(REMOVE_DUPLICATES _BOOST_$(lname:U)_DEPS)"
-            "  message(STATUS \"Adding $(name) dependencies: ${_BOOST_$(lname:U)_DEPS}\")"
+            "  if(Boost_VERBOSE OR Boost_DEBUG)"
+            "    message(STATUS \"Adding $(name) dependencies: ${_BOOST_$(lname:U)_DEPS}\")"
+            "  endif()"
             "endif()"
             ""
             "foreach(dep_$(name) IN LISTS _BOOST_$(lname:U)_DEPS")
