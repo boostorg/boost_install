@@ -76,7 +76,7 @@ test_script:
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
   - if "%UBP%" == "" SET UBP=0
-  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local -DUSE_BOOST_PACKAGE=%UBP% ..
+  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON ..
   - cmake --build . --config Debug
   - cmake --build . --config Release
   - PATH %PATH%;C:\projects\.local\lib

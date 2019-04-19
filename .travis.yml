@@ -114,7 +114,7 @@ script:
   - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${PYTHON:+python=$PYTHON} install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} ..
+  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
   - cmake --build . --target check
