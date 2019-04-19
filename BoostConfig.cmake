@@ -106,6 +106,10 @@ macro(boost_find_dependency dep req)
   endif()
   find_package(boost_${dep} ${Boost_VERSION} EXACT CONFIG ${_BOOST_REQUIRED} ${_BOOST_QUIET} HINTS ${_BOOST_CMAKEDIR})
 
+  # FindPackageHandleStandardArgs expects <package>_<component>_FOUND
+  set(Boost_${dep}_FOUND ${boost_${dep}_FOUND})
+
+  # FindBoost sets Boost_<COMPONENT>_FOUND
   string(TOUPPER ${dep} _BOOST_DEP)
   set(Boost_${_BOOST_DEP}_FOUND ${boost_${dep}_FOUND})
 
