@@ -65,6 +65,18 @@ matrix:
     - env: LIB=filesystem LAYOUT=versioned TOOLSET=gcc,clang
       compiler: clang++
 
+    # static only
+    - env: LIB=filesystem LINK=static
+
+    # static only, w/Boost_USE_STATIC_LIBS=ON
+    - env: LIB=filesystem LINK=static USE_STATIC_LIBS=ON
+
+    # shared only, w/BUILD_SHARED_LIBS
+    - env: LIB=filesystem LINK=shared BUILD_SHARED_LIBS=ON
+
+    # shared only, w/Boost_USE_STATIC_LIBS=OFF
+    - env: LIB=filesystem LINK=shared USE_STATIC_LIBS=OFF
+
     # other libraries
     - env: LIB=atomic
     - env: LIB=atomic UBP=1
@@ -111,10 +123,10 @@ script:
     echo "using python : 2.7 ;" >> ~/user-config.jam
   - |-
     echo "using python : 3.5 ;" >> ~/user-config.jam
-  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${PYTHON:+python=$PYTHON} install
+  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ..
+  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ${USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$USE_STATIC_LIBS} ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
   - cmake --build . --target check
