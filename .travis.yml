@@ -67,14 +67,10 @@ matrix:
 
     # static only
     - env: LIB=filesystem LINK=static
+    - env: LIB=filesystem LINK=static BUILD_SHARED_LIBS=ON USE_STATIC_LIBS=ON
 
-    # static only, w/Boost_USE_STATIC_LIBS=ON
-    - env: LIB=filesystem LINK=static USE_STATIC_LIBS=ON
-
-    # shared only, w/BUILD_SHARED_LIBS
+    # shared only
     - env: LIB=filesystem LINK=shared BUILD_SHARED_LIBS=ON
-
-    # shared only, w/Boost_USE_STATIC_LIBS=OFF
     - env: LIB=filesystem LINK=shared USE_STATIC_LIBS=OFF
 
     # other libraries
