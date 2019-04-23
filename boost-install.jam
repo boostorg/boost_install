@@ -180,14 +180,16 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "if(NOT \"${Boost_USE_STATIC_LIBS}\" STREQUAL \"\" AND NOT Boost_USE_STATIC_LIBS)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"static, Boost_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}\")"
-            "  return()"
-            "endif()"
-            ""
-            "if(BUILD_SHARED_LIBS)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"static, BUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}, set Boost_USE_STATIC_LIBS=ON to override\")"
-            "  return()"
+            "if(DEFINED Boost_USE_STATIC_LIBS)"
+            "  if(NOT Boost_USE_STATIC_LIBS)"
+            "    _BOOST_SKIPPED(\"$(fname)\" \"static, Boost_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}\")"
+            "    return()"
+            "  endif()"
+            "else()"
+            "  if(BUILD_SHARED_LIBS)"
+            "    _BOOST_SKIPPED(\"$(fname)\" \"static, BUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}, set Boost_USE_STATIC_LIBS=ON to override\")"
+            "    return()"
+            "  endif()"
             "endif()"
             ""
             : true ;
@@ -196,14 +198,16 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "if(NOT \"${Boost_USE_STATIC_LIBS}\" STREQUAL \"\" AND Boost_USE_STATIC_LIBS)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"shared, Boost_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}\")"
-            "  return()"
-            "endif()"
-            ""
-            "if(NOT BUILD_SHARED_LIBS)"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"shared, BUILD_SHARED_LIBS not ON, set Boost_USE_STATIC_LIBS=OFF to override\")"
-            "  return()"
+            "if(DEFINED Boost_USE_STATIC_LIBS)"
+            "  if(Boost_USE_STATIC_LIBS)"
+            "    _BOOST_SKIPPED(\"$(fname)\" \"shared, Boost_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}\")"
+            "    return()"
+            "  endif()"
+            "else()"
+            "  if(NOT BUILD_SHARED_LIBS)"
+            "    _BOOST_SKIPPED(\"$(fname)\" \"shared, BUILD_SHARED_LIBS not ON, set Boost_USE_STATIC_LIBS=OFF to override\")"
+            "    return()"
+            "  endif()"
             "endif()"
             ""
             : true ;
