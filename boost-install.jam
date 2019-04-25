@@ -323,6 +323,18 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         ""
         : true ;
 
+    if $(variant) = release
+    {
+        print.text
+
+        "set_target_properties($(target) PROPERTIES"
+        "  MAP_IMPORTED_CONFIG_MINSIZEREL Release"
+        "  MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release"
+        "  )"
+        ""
+        : true ;
+    }
+
     if $(link) = shared
     {
         print.text
