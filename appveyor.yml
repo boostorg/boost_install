@@ -77,8 +77,8 @@ test_script:
   - mkdir __build__ && cd __build__
   - if "%UBP%" == "" SET UBP=0
   - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON ..
-  - cmake --build . --config Debug
-  - cmake --build . --config Release
   - PATH %PATH%;C:\projects\.local\lib
-  - cmake --build . --config Debug --target check
-  - cmake --build . --config Release --target check
+  - cmake --build . --config Debug && cmake --build . --config Debug --target check
+  - cmake --build . --config Release && cmake --build . --config Release --target check
+  - cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
+  - cmake --build . --config RelWithDebInfo && cmake --build . --config RelWithDebInfo --target check
