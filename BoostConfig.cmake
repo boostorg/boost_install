@@ -25,9 +25,8 @@
 # Boost_USE_DEBUG_LIBS:     When OFF, disables debug libraries.
 # Boost_USE_RELEASE_LIBS:   When OFF, disables release libraries.
 # Boost_USE_STATIC_LIBS:    When ON, uses static Boost libraries; when OFF,
-#                           uses shared Boost libraries; when not set, the
-#                           default is to use shared when BUILD_SHARED_LIBS is
-#                           ON, static otherwise.
+#                           uses shared Boost libraries; when not set, uses
+#                           static on Windows, shared otherwise.
 # Boost_USE_STATIC_RUNTIME: When ON, uses Boost libraries linked against the
 #                           static runtime. The default is shared runtime.
 # Boost_USE_DEBUG_RUNTIME:  When ON, uses Boost libraries linked against the
