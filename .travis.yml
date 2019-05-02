@@ -84,6 +84,8 @@ matrix:
     - env: LIB=iostreams UBP=1
     - env: LIB=log
     - env: LIB=log UBP=1
+    - env: LIB=program_options
+    - env: LIB=program_options UBP=1
     - env: LIB=python PYTHON=2.7,3.5
     - env: LIB=python UBP=1 PYTHON=2.7,3.5
     - env: LIB=random
