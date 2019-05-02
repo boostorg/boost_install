@@ -65,13 +65,13 @@ matrix:
     - env: LIB=filesystem LAYOUT=versioned TOOLSET=gcc,clang
       compiler: clang++
 
-    # static only
-    - env: LIB=filesystem LINK=static
-    - env: LIB=filesystem LINK=static BUILD_SHARED_LIBS=ON USE_STATIC_LIBS=ON
-
-    # shared only
-    - env: LIB=filesystem LINK=shared BUILD_SHARED_LIBS=ON
+    # shared
+    - env: LIB=filesystem LINK=shared
     - env: LIB=filesystem LINK=shared USE_STATIC_LIBS=OFF
+
+    # static
+    - env: LIB=filesystem USE_STATIC_LIBS=ON
+    - env: LIB=filesystem LINK=static USE_STATIC_LIBS=ON
 
     # other libraries
     - env: LIB=atomic
@@ -122,7 +122,7 @@ script:
   - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} ${USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$USE_STATIC_LIBS} ..
+  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$USE_STATIC_LIBS} ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
   - cmake --build . --target check
