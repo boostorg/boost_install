@@ -37,7 +37,8 @@ environment:
   - LIB: serialization
     UBP: 1
     TOOLSET: msvc-14.1
-  - LIB: system
+  - LIB: regex
+    UBP: 1
     TOOLSET: msvc-14.1
   - LIB: test
     UBP: 1

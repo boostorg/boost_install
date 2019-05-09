@@ -12,6 +12,14 @@ if(USE_BOOST_PACKAGE)
 
   find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS regex)
 
+  # Using `include_directories`, `link_directories`, `link_libraries`
+  # is bad practice, done here for testing purposes. The right, "modern
+  # CMake", thing to do is `target_link_libraries(main Boost::regex)`.
+
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+  link_libraries(${Boost_LIBRARIES})
+
 else()
 
   find_package(boost_regex ${BOOST_VERSION} EXACT CONFIG REQUIRED)
@@ -19,7 +27,12 @@ else()
 endif()
 
 add_executable(main quick.cpp)
-target_link_libraries(main Boost::regex)
+
+if(NOT USE_BOOST_PACKAGE)
+
+  target_link_libraries(main Boost::regex)
+
+endif()
 
 enable_testing()
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C $<CONFIG>)
