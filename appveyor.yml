@@ -24,6 +24,8 @@ environment:
   - LIB: filesystem
     LAYOUT: tagged
     TOOLSET: msvc-14.0
+  - LIB: headers
+    TOOLSET: msvc-14.1
   - LIB: iostreams
     TOOLSET: msvc-14.1
     UBP: 1
