@@ -112,6 +112,12 @@ macro(boost_find_dependency dep req)
   string(TOUPPER ${dep} _BOOST_DEP)
   set(Boost_${_BOOST_DEP}_FOUND ${boost_${dep}_FOUND})
 
+  # FindBoost compatibility variables: Boost_LIBRARIES, Boost_<C>_LIBRARY
+  if(boost_${dep}_FOUND)
+    list(APPEND Boost_LIBRARIES Boost::${dep})
+    set(Boost_${_BOOST_DEP}_LIBRARY Boost::${dep})
+  endif()
+
   unset(_BOOST_REQUIRED)
   unset(_BOOST_QUIET)
   unset(_BOOST_CMAKEDIR)
@@ -131,6 +137,11 @@ if(NOT boost_headers_FOUND)
   return()
 
 endif()
+
+# Compatibility variables
+
+get_target_property(Boost_INCLUDE_DIRS Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
+set(Boost_LIBRARIES)
 
 # Find components
 
