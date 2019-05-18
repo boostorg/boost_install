@@ -130,6 +130,7 @@ script:
   - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$USE_STATIC_LIBS} ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
+  - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$DYLD_LIBRARY_PATH
   - cmake --build . --target check
 
 notifications:
