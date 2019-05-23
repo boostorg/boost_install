@@ -65,13 +65,21 @@ matrix:
     - env: LIB=filesystem LAYOUT=versioned TOOLSET=gcc,clang
       compiler: clang++
 
+    # build with gcc, use with clang (w/ toolset override)
+    - env: LIB=filesystem LAYOUT=versioned Boost_COMPILER=gcc5
+      compiler: clang++
+
+    # same, w/ -gcc5
+    - env: LIB=filesystem LAYOUT=versioned Boost_COMPILER=-gcc5
+      compiler: clang++
+
     # shared
     - env: LIB=filesystem LINK=shared
-    - env: LIB=filesystem LINK=shared USE_STATIC_LIBS=OFF
+    - env: LIB=filesystem LINK=shared Boost_USE_STATIC_LIBS=OFF
 
     # static
-    - env: LIB=filesystem USE_STATIC_LIBS=ON
-    - env: LIB=filesystem LINK=static USE_STATIC_LIBS=ON
+    - env: LIB=filesystem Boost_USE_STATIC_LIBS=ON
+    - env: LIB=filesystem LINK=static Boost_USE_STATIC_LIBS=ON
 
     # Boost_INCLUDE_DIRS, old style
     - env: LIB=headers
@@ -127,7 +135,7 @@ script:
   - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$USE_STATIC_LIBS} ..
+  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
   - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$DYLD_LIBRARY_PATH
