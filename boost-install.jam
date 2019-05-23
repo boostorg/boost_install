@@ -161,14 +161,16 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "if(Boost_COMPILER AND NOT Boost_COMPILER STREQUAL \"$(toolset)\")"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), Boost_COMPILER=${Boost_COMPILER}\")"
-            "  return()"
-            "endif()"
-            ""
-            "if(BOOST_DETECTED_TOOLSET AND NOT BOOST_DETECTED_TOOLSET STREQUAL \"$(toolset)\")"
-            "  _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), detected ${BOOST_DETECTED_TOOLSET}, set Boost_COMPILER to override\")"
-            "  return()"
+            "if(Boost_COMPILER)"
+            "  if(NOT Boost_COMPILER STREQUAL \"$(toolset)\")"
+            "    _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), Boost_COMPILER=${Boost_COMPILER}\")"
+            "    return()"
+            "  endif()"
+            "else()"
+            "  if(BOOST_DETECTED_TOOLSET AND NOT BOOST_DETECTED_TOOLSET STREQUAL \"$(toolset)\")"
+            "    _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), detected ${BOOST_DETECTED_TOOLSET}, set Boost_COMPILER to override\")"
+            "    return()"
+            "  endif()"
             "endif()"
             ""
             : true ;
