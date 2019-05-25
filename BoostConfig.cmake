@@ -140,6 +140,13 @@ endif()
 
 # Compatibility variables
 
+set(Boost_MAJOR_VERSION ${Boost_VERSION_MAJOR})
+set(Boost_MINOR_VERSION ${Boost_VERSION_MINOR})
+set(Boost_SUBMINOR_VERSION ${Boost_VERSION_PATCH})
+
+set(Boost_VERSION_STRING ${Boost_VERSION})
+set(Boost_VERSION_MACRO ${Boost_VERSION_MAJOR}0${Boost_VERSION_MINOR}0${Boost_VERSION_PATCH})
+
 get_target_property(Boost_INCLUDE_DIRS Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
 set(Boost_LIBRARIES)
 
