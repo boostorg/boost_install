@@ -668,6 +668,12 @@ rule generate-cmake-config- ( target : sources * : properties * )
             : true ;
         }
     }
+
+    print.text
+
+        "mark_as_advanced($(name)_DIR)"
+        ""
+        : true ;
 }
 
 actions generate-cmake-config-
