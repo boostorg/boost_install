@@ -84,9 +84,7 @@ if(Boost_VERBOSE OR Boost_DEBUG)
 
 endif()
 
-# find_dependency doesn't forward arguments until 3.9, so we have to roll our own
-
-macro(boost_find_dependency dep req)
+macro(boost_find_component comp req)
 
   set(_BOOST_QUIET)
   if(Boost_FIND_QUIETLY)
@@ -98,36 +96,53 @@ macro(boost_find_dependency dep req)
     set(_BOOST_REQUIRED REQUIRED)
   endif()
 
+  if("${comp}" MATCHES "^(python|numpy)([1-9])([0-9])$")
+
+    # handle pythonXY and numpyXY versioned components for compatibility
+
+    set(Boost_PYTHON_VERSION "${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
+    set(__boost_comp_nv "${CMAKE_MATCH_1}")
+
+  else()
+
+    set(__boost_comp_nv "${comp}")
+
+  endif()
+
   get_filename_component(_BOOST_CMAKEDIR "${CMAKE_CURRENT_LIST_DIR}/../" ABSOLUTE)
 
   if(Boost_DEBUG)
-    message(STATUS "BoostConfig: find_package(boost_${dep} ${Boost_VERSION} EXACT CONFIG ${_BOOST_REQUIRED} ${_BOOST_QUIET} HINTS ${_BOOST_CMAKEDIR})")
+    message(STATUS "BoostConfig: find_package(boost_${__boost_comp_nv} ${Boost_VERSION} EXACT CONFIG ${_BOOST_REQUIRED} ${_BOOST_QUIET} HINTS ${_BOOST_CMAKEDIR})")
   endif()
-  find_package(boost_${dep} ${Boost_VERSION} EXACT CONFIG ${_BOOST_REQUIRED} ${_BOOST_QUIET} HINTS ${_BOOST_CMAKEDIR})
+  find_package(boost_${__boost_comp_nv} ${Boost_VERSION} EXACT CONFIG ${_BOOST_REQUIRED} ${_BOOST_QUIET} HINTS ${_BOOST_CMAKEDIR})
+
+  set(__boost_comp_found ${boost_${__boost_comp_nv}_FOUND})
 
   # FindPackageHandleStandardArgs expects <package>_<component>_FOUND
-  set(Boost_${dep}_FOUND ${boost_${dep}_FOUND})
+  set(Boost_${comp}_FOUND ${__boost_comp_found})
 
   # FindBoost sets Boost_<COMPONENT>_FOUND
-  string(TOUPPER ${dep} _BOOST_DEP)
-  set(Boost_${_BOOST_DEP}_FOUND ${boost_${dep}_FOUND})
+  string(TOUPPER ${comp} _BOOST_COMP)
+  set(Boost_${_BOOST_COMP}_FOUND ${__boost_comp_found})
 
   # FindBoost compatibility variables: Boost_LIBRARIES, Boost_<C>_LIBRARY
-  if(boost_${dep}_FOUND)
-    list(APPEND Boost_LIBRARIES Boost::${dep})
-    set(Boost_${_BOOST_DEP}_LIBRARY Boost::${dep})
+  if(__boost_comp_found)
+    list(APPEND Boost_LIBRARIES Boost::${__boost_comp_nv})
+    set(Boost_${_BOOST_COMP}_LIBRARY Boost::${__boost_comp_nv})
   endif()
 
   unset(_BOOST_REQUIRED)
   unset(_BOOST_QUIET)
   unset(_BOOST_CMAKEDIR)
-  unset(_BOOST_DEP)
+  unset(__boost_comp_nv)
+  unset(__boost_comp_found)
+  unset(_BOOST_COMP)
 
 endmacro()
 
 # Find boost_headers
 
-boost_find_dependency(headers 1)
+boost_find_component(headers 1)
 
 if(NOT boost_headers_FOUND)
 
@@ -154,20 +169,7 @@ set(Boost_LIBRARIES)
 
 foreach(__boost_comp IN LISTS Boost_FIND_COMPONENTS)
 
-  set(__boost_req ${Boost_FIND_REQUIRED_${__boost_comp}})
-
-  if(__boost_comp MATCHES "^(python|numpy)([1-9])([0-9])$")
-
-    # handle pythonXY and numpyXY versioned components for compatibility
-
-    set(Boost_PYTHON_VERSION "${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
-    set(__boost_comp "${CMAKE_MATCH_1}")
-
-  endif()
-
-  boost_find_dependency(${__boost_comp} ${__boost_req})
-
-  unset(__boost_req)
+  boost_find_component(${__boost_comp} ${Boost_FIND_REQUIRED_${__boost_comp}})
 
 endforeach()
 
