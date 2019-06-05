@@ -10,14 +10,21 @@ include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
 
 find_package(PythonLibs 2.7 REQUIRED)
 
-# use the found Python version in case more than one Boost.Python is installed
-set(Boost_PYTHON_VERSION ${PYTHONLIBS_VERSION_STRING})
-
 if(USE_BOOST_PACKAGE)
 
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS python)
+  # test the versioned pythonXY component for backward compatibility
+
+  string(REPLACE "." ";" PYTHONLIBS_VERSION_LIST ${PYTHONLIBS_VERSION_STRING})
+
+  list(GET PYTHONLIBS_VERSION_LIST 0 PYTHONLIBS_VERSION_MAJOR)
+  list(GET PYTHONLIBS_VERSION_LIST 1 PYTHONLIBS_VERSION_MINOR)
+
+  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS python${PYTHONLIBS_VERSION_MAJOR}${PYTHONLIBS_VERSION_MINOR})
 
 else()
+
+  # use the found Python version in case more than one Boost.Python is installed
+  set(Boost_PYTHON_VERSION ${PYTHONLIBS_VERSION_STRING})
 
   find_package(boost_python ${BOOST_VERSION} EXACT CONFIG REQUIRED)
 

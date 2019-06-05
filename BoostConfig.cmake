@@ -154,7 +154,20 @@ set(Boost_LIBRARIES)
 
 foreach(__boost_comp IN LISTS Boost_FIND_COMPONENTS)
 
-  boost_find_dependency(${__boost_comp} ${Boost_FIND_REQUIRED_${__boost_comp}})
+  set(__boost_req ${Boost_FIND_REQUIRED_${__boost_comp}})
+
+  if(__boost_comp MATCHES "^(python|numpy)([1-9])([0-9])$")
+
+    # handle pythonXY and numpyXY versioned components for compatibility
+
+    set(Boost_PYTHON_VERSION "${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
+    set(__boost_comp "${CMAKE_MATCH_1}")
+
+  endif()
+
+  boost_find_dependency(${__boost_comp} ${__boost_req})
+
+  unset(__boost_req)
 
 endforeach()
 
