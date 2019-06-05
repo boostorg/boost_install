@@ -34,6 +34,10 @@ environment:
   - LIB: python
     TOOLSET: msvc-14.1
     PYTHON: 2.7,3.6,3.7
+  - LIB: python
+    UBP: 1
+    TOOLSET: msvc-14.1
+    PYTHON: 2.7,3.6,3.7
   - LIB: serialization
     UBP: 1
     TOOLSET: msvc-14.1
