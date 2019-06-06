@@ -10,6 +10,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
 
 find_package(PythonLibs 2.7 REQUIRED)
 
+set(component python)
+
 if(USE_BOOST_PACKAGE)
 
   # test the versioned pythonXY component for backward compatibility
@@ -19,7 +21,9 @@ if(USE_BOOST_PACKAGE)
   list(GET PYTHONLIBS_VERSION_LIST 0 PYTHONLIBS_VERSION_MAJOR)
   list(GET PYTHONLIBS_VERSION_LIST 1 PYTHONLIBS_VERSION_MINOR)
 
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS python${PYTHONLIBS_VERSION_MAJOR}${PYTHONLIBS_VERSION_MINOR})
+  set(component python${PYTHONLIBS_VERSION_MAJOR}${PYTHONLIBS_VERSION_MINOR})
+
+  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS ${component})
 
 else()
 
@@ -31,7 +35,7 @@ else()
 endif()
 
 add_executable(main quick.cpp)
-target_link_libraries(main Boost::python ${PYTHON_LIBRARIES})
+target_link_libraries(main Boost::${component} ${PYTHON_LIBRARIES})
 target_include_directories(main PRIVATE ${PYTHON_INCLUDE_DIRS})
 
 enable_testing()

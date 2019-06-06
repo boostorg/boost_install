@@ -127,8 +127,18 @@ macro(boost_find_component comp req)
 
   # FindBoost compatibility variables: Boost_LIBRARIES, Boost_<C>_LIBRARY
   if(__boost_comp_found)
+
     list(APPEND Boost_LIBRARIES Boost::${__boost_comp_nv})
     set(Boost_${_BOOST_COMP}_LIBRARY Boost::${__boost_comp_nv})
+
+    if(NOT "${comp}" STREQUAL "${__boost_comp_nv}" AND NOT TARGET Boost::${comp})
+
+      # Versioned target alias (f.ex. Boost::python27) for compatibility
+      add_library(Boost::${comp} INTERFACE IMPORTED)
+      set_property(TARGET Boost::${comp} APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::${__boost_comp_nv})
+
+    endif()
+
   endif()
 
   unset(_BOOST_REQUIRED)
