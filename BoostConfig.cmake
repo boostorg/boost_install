@@ -173,7 +173,7 @@ set(Boost_VERSION_STRING ${Boost_VERSION})
 set(Boost_VERSION_MACRO ${Boost_VERSION_MAJOR}0${Boost_VERSION_MINOR}0${Boost_VERSION_PATCH})
 
 get_target_property(Boost_INCLUDE_DIRS Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
-set(Boost_LIBRARIES)
+set(Boost_LIBRARIES "")
 
 # Find components
 
