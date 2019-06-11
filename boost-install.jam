@@ -500,7 +500,7 @@ local rule get-dir ( name : dir )
     {
         print.text
 
-            "get_filename_component($(name) \"${_BOOST_CMAKEDIR}/$(dir)/\" ABSOLUTE)"
+            "get_filename_component($(name) \"${CMAKE_CURRENT_LIST_DIR}/../$(dir)/\" ABSOLUTE)"
 
         : true ;
     }
@@ -549,12 +549,9 @@ rule generate-cmake-config- ( target : sources * : properties * )
         "  message(STATUS \"Found $(name) ${$(name)_VERSION} at ${$(name)_DIR}\")"
         "endif()"
         ""
-        "# Compute the include and library directories relative to this file."
-        "get_filename_component(_BOOST_CMAKEDIR \"${CMAKE_CURRENT_LIST_DIR}/../\" ABSOLUTE)"
         : true ;
 
     get-dir "_BOOST_INCLUDEDIR" : $(includedir) ;
-    get-dir "_BOOST_LIBDIR" : $(libdir) ;
 
     print.text
 
@@ -564,13 +561,15 @@ rule generate-cmake-config- ( target : sources * : properties * )
         ""
         "set_target_properties($(ltarget) PROPERTIES"
         "  INTERFACE_INCLUDE_DIRECTORIES \"\${_BOOST_INCLUDEDIR}\""
-        "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
+        "  INTERFACE_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB"
         ")"
+        "unset(_BOOST_INCLUDEDIR)"
         ""
         : true ;
 
     if $(library-type) != INTERFACE
     {
+        get-dir "_BOOST_LIBDIR" : $(libdir) ;
         print.text
 
             "include(${CMAKE_CURRENT_LIST_DIR}/../BoostDetectToolset-$(version).cmake)"
@@ -596,8 +595,6 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "endforeach()"
             ""
             "unset(_BOOST_LIBDIR)"
-            "unset(_BOOST_INCLUDEDIR)"
-            "unset(_BOOST_CMAKEDIR)"
             ""
             "get_target_property(__boost_configs $(ltarget) IMPORTED_CONFIGURATIONS)"
             ""
