@@ -96,7 +96,7 @@ macro(boost_find_component comp req)
     set(_BOOST_REQUIRED REQUIRED)
   endif()
 
-  if("${comp}" MATCHES "^(python|numpy)([1-9])([0-9])$")
+  if("${comp}" MATCHES "^(python|numpy|mpi_python)([1-9])([0-9])$")
 
     # handle pythonXY and numpyXY versioned components for compatibility
 
