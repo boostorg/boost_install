@@ -668,6 +668,16 @@ rule generate-cmake-config- ( target : sources * : properties * )
             : true ;
         }
     }
+    else
+    {
+        print.text
+
+            "unset(_BOOST_LIBDIR)"
+            "unset(_BOOST_INCLUDEDIR)"
+            "unset(_BOOST_CMAKEDIR)"
+            ""
+            : true ;
+    }
 
     print.text
 
