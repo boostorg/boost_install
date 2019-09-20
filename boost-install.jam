@@ -267,6 +267,29 @@ rule generate-cmake-variant- ( target : sources * : properties * )
 
     print.text "# threading=$(threading)" "" : true ;
 
+    if $(threading) = "multi"
+    {
+        print.text
+
+            "if(NOT \"${Boost_USE_MULTITHREADED}\" STREQUAL \"\" AND NOT Boost_USE_MULTITHREADED)"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"multithreaded, Boost_USE_MULTITHREADED=${Boost_USE_MULTITHREADED}\")"
+            "  return()"
+            "endif()"
+            ""
+            : true ;
+    }
+    else
+    {
+        print.text
+
+            "if(Boost_USE_MULTITHREADED)"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"single-threaded, Boost_USE_MULTITHREADED=${Boost_USE_MULTITHREADED}\")"
+            "  return()"
+            "endif()"
+            ""
+            : true ;
+    }
+
     print.text "# variant=$(variant)" "" : true ;
 
     if $(variant) = debug
