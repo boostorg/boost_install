@@ -83,6 +83,7 @@ matrix:
 
     # threading=multi,single
     - env: LIB=filesystem LAYOUT=tagged-1.66 THREADING=multi,single Boost_USE_MULTITHREADED=ON
+    - env: LIB=filesystem LAYOUT=tagged-1.66 THREADING=multi,single Boost_USE_MULTITHREADED=OFF
 
     # Boost_INCLUDE_DIRS, old style
     - env: LIB=headers
