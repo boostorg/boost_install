@@ -81,6 +81,9 @@ matrix:
     - env: LIB=filesystem Boost_USE_STATIC_LIBS=ON
     - env: LIB=filesystem LINK=static Boost_USE_STATIC_LIBS=ON
 
+    # threading=multi,single
+    - env: LIB=filesystem LAYOUT=tagged-1.66 THREADING=multi,single Boost_USE_MULTITHREADED=ON
+
     # Boost_INCLUDE_DIRS, old style
     - env: LIB=headers
 
@@ -132,10 +135,10 @@ script:
     echo "using python : 2.7 ;" >> ~/user-config.jam
   - |-
     echo "using python : 3.5 ;" >> ~/user-config.jam
-  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} install
+  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} ${THREADING:+threading=$THREADING} install
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ..
+  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
   - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$DYLD_LIBRARY_PATH
