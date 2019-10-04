@@ -47,11 +47,9 @@
 # Boost_VERBOSE:            Enable verbose output
 # Boost_DEBUG:              Enable debug (even more verbose) output
 
-if(Boost_VERBOSE OR Boost_DEBUG)
-
-  message(STATUS "Found Boost ${Boost_VERSION} at ${Boost_DIR}")
-
+function(_boost_output_requested_configuration)
   # Output requested configuration (f.ex. "REQUIRED COMPONENTS filesystem")
+  # Function used for scoping
 
   if(Boost_FIND_QUIETLY)
     set(_BOOST_CONFIG "${_BOOST_CONFIG} QUIET")
@@ -80,11 +78,12 @@ if(Boost_VERBOSE OR Boost_DEBUG)
   if(_BOOST_CONFIG)
     message(STATUS "  Requested configuration:${_BOOST_CONFIG}")
   endif()
+endfunction()
 
-  unset(_BOOST_CONFIG)
-  unset(_BOOST_COMPONENTS)
-  unset(_BOOST_OPTIONAL_COMPONENTS)
+if(Boost_VERBOSE OR Boost_DEBUG)
+  message(STATUS "Found Boost ${Boost_VERSION} at ${Boost_DIR}")
 
+  _boost_output_requested_configuration()
 endif()
 
 macro(boost_find_component comp req)

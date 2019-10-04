@@ -523,7 +523,7 @@ local rule get-dir ( name : dir )
     {
         print.text
 
-            "get_filename_component($(name) \"${_BOOST_CMAKEDIR}/$(dir)/\" ABSOLUTE)"
+            "get_filename_component($(name) \"${CMAKE_CURRENT_LIST_DIR}/../$(dir)/\" ABSOLUTE)"
 
         : true ;
     }
@@ -572,12 +572,9 @@ rule generate-cmake-config- ( target : sources * : properties * )
         "  message(STATUS \"Found $(name) ${$(name)_VERSION} at ${$(name)_DIR}\")"
         "endif()"
         ""
-        "# Compute the include and library directories relative to this file."
-        "get_filename_component(_BOOST_CMAKEDIR \"${CMAKE_CURRENT_LIST_DIR}/../\" ABSOLUTE)"
         : true ;
 
     get-dir "_BOOST_INCLUDEDIR" : $(includedir) ;
-    get-dir "_BOOST_LIBDIR" : $(libdir) ;
 
     print.text
 
@@ -587,67 +584,26 @@ rule generate-cmake-config- ( target : sources * : properties * )
         ""
         "set_target_properties($(ltarget) PROPERTIES"
         "  INTERFACE_INCLUDE_DIRECTORIES \"\${_BOOST_INCLUDEDIR}\""
-        "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
+        "  INTERFACE_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB"
         ")"
+        "unset(_BOOST_INCLUDEDIR)"
         ""
         : true ;
 
     if $(library-type) != INTERFACE
     {
+        get-dir "_BOOST_LIBDIR" : $(libdir) ;
         print.text
 
-            "include(${CMAKE_CURRENT_LIST_DIR}/../BoostDetectToolset-$(version).cmake)"
-            ""
-            "if(Boost_DEBUG)"
-            "  message(STATUS \"Scanning ${CMAKE_CURRENT_LIST_DIR}/lib$(name)-variant*.cmake\")"
-            "endif()"
-            ""
-            "file(GLOB __boost_variants \"${CMAKE_CURRENT_LIST_DIR}/lib$(name)-variant*.cmake\")"
-            ""
-            "macro(_BOOST_SKIPPED fname reason)"
-            "  if(Boost_VERBOSE OR Boost_DEBUG)"
-            "    message(STATUS \"  [ ] ${fname}\")"
-            "  endif()"
-            "  list(APPEND __boost_skipped \"${fname} (${reason})\")"
-            "endmacro()"
-            ""
-            "foreach(f IN LISTS __boost_variants)"
-            "  if(Boost_DEBUG)"
-            "    message(STATUS \"  Including ${f}\")"
-            "  endif()"
-            "  include(${f})"
-            "endforeach()"
-            ""
+            "include(${CMAKE_CURRENT_LIST_DIR}/../BoostFindVariants.cmake)"
+            "boost_find_variants($(lname) $(name))"
             "unset(_BOOST_LIBDIR)"
-            "unset(_BOOST_INCLUDEDIR)"
-            "unset(_BOOST_CMAKEDIR)"
             ""
-            "get_target_property(__boost_configs $(ltarget) IMPORTED_CONFIGURATIONS)"
-            ""
-            "if(__boost_variants AND NOT __boost_configs)"
-            "  set(__boost_message \"No suitable build variant has been found.\")"
-            "  if(__boost_skipped)"
-            "    set(__boost_message \"${__boost_message}\\nThe following variants have been tried and rejected:\")"
-            "    foreach(s IN LISTS __boost_skipped)"
-            "      set(__boost_message \"${__boost_message}\\n* ${s}\")"
-            "    endforeach()"
-            "  endif()"
-            "  set($(name)_FOUND 0)"
-            "  set($(name)_NOT_FOUND_MESSAGE ${__boost_message})"
-            "  unset(__boost_message)"
-            "  unset(__boost_skipped)"
-            "  unset(__boost_configs)"
-            "  unset(__boost_variants)"
-            "  unset(_BOOST_$(lname:U)_DEPS)"
+            "if(NOT $(name)_FOUND)"
             "  return()"
             "endif()"
             ""
-            "unset(__boost_skipped)"
-            "unset(__boost_configs)"
-            "unset(__boost_variants)"
-            ""
             "if(_BOOST_$(lname:U)_DEPS)"
-            "  list(REMOVE_DUPLICATES _BOOST_$(lname:U)_DEPS)"
             "  if(Boost_VERBOSE OR Boost_DEBUG)"
             "    message(STATUS \"Adding $(name) dependencies: ${_BOOST_$(lname:U)_DEPS}\")"
             "  endif()"
@@ -838,9 +794,6 @@ rule install-cmake-config ( name * )
     {
         local p = [ project.current ] ;
 
-        alias install-detect-toolset ;
-        $(p).mark-target-as-explicit install-detect-toolset ;
-
         alias install-cmake-config ;
         $(p).mark-target-as-explicit install-cmake-config ;
     }
@@ -870,13 +823,18 @@ rule install-cmake-config ( name * )
 
         local p = [ project.current ] ;
 
-        # Target install-detect-toolset
-
         local boost-install-dir = [ modules.binding $(__name__) ] ;
         boost-install-dir = $(boost-install-dir:D) ;
 
-        install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(BOOST_VERSION).cmake ;
+        # Target install-detect-toolset
+
+        install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) ;
         $(p).mark-target-as-explicit install-detect-toolset ;
+
+        # Target install-find-variants
+
+        install install-find-variants : $(boost-install-dir)/BoostFindVariants.cmake : <location>$(cmakedir) ;
+        $(p).mark-target-as-explicit install-find-variants ;
 
         # Target install-boost-config
 
@@ -893,7 +851,7 @@ rule install-cmake-config ( name * )
 
         # Target install-cmake-config
 
-        alias install-cmake-config : $(configs) install-detect-toolset install-boost-config install-boost-config-version ;
+        alias install-cmake-config : $(configs) install-detect-toolset install-find-variants install-boost-config install-boost-config-version ;
         $(p).mark-target-as-explicit install-cmake-config ;
     }
 }
