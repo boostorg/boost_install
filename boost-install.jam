@@ -972,7 +972,7 @@ rule generate-dependencies ( project name ? : property-set : sources * )
 
 # boost-install
 
-rule boost-install ( libraries * )
+rule boost-install ( libraries * : requirements ? )
 {
     .debug boost-install $(libraries) ;
 
@@ -981,7 +981,7 @@ rule boost-install ( libraries * )
     local p = [ project.current ] ;
 
     package.install install-libraries Boost
-        : # No requirements
+        : $(requirements)
         : # No binaries
         : $(libraries)
         : # No headers
@@ -1001,10 +1001,10 @@ rule boost-install ( libraries * )
 
     local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
 
-    install stage-libraries-static : $(libraries) : <location>$(stage-locate)/lib <install-dependencies>on <install-type>STATIC_LIB ;
+    install stage-libraries-static : $(libraries) : $(requirements) <location>$(stage-locate)/lib <install-dependencies>on <install-type>STATIC_LIB ;
     $(p).mark-target-as-explicit stage-libraries-static ;
 
-    install stage-libraries-shared : $(libraries) : <location>$(stage-locate)/lib <install-dependencies>on <install-type>SHARED_LIB ;
+    install stage-libraries-shared : $(libraries) : $(requirements) <location>$(stage-locate)/lib <install-dependencies>on <install-type>SHARED_LIB ;
     $(p).mark-target-as-explicit stage-libraries-shared ;
 
     generate stage-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>stage ;
