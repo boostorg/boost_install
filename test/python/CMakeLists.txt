@@ -4,11 +4,21 @@
 
 cmake_minimum_required(VERSION 3.5)
 
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
 project(CmakeConfigPythonTest LANGUAGES CXX)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
 
 find_package(PythonLibs 2.7 REQUIRED)
+
+set(BOOST_HINTS)
+
+if(USE_STAGED_BOOST)
+  set(BOOST_HINTS HINTS ../../../../stage)
+endif()
 
 set(component python)
 
@@ -23,14 +33,14 @@ if(USE_BOOST_PACKAGE)
 
   set(component python${PYTHONLIBS_VERSION_MAJOR}${PYTHONLIBS_VERSION_MINOR})
 
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS ${component})
+  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS ${component} ${BOOST_HINTS})
 
 else()
 
   # use the found Python version in case more than one Boost.Python is installed
   set(Boost_PYTHON_VERSION ${PYTHONLIBS_VERSION_STRING})
 
-  find_package(boost_python ${BOOST_VERSION} EXACT CONFIG REQUIRED)
+  find_package(boost_python ${BOOST_VERSION} EXACT CONFIG REQUIRED ${BOOST_HINTS})
 
 endif()
 
