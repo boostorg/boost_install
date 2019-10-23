@@ -85,6 +85,14 @@ matrix:
     - env: LIB=filesystem LAYOUT=tagged-1.66 THREADING=multi,single Boost_USE_MULTITHREADED=ON
     - env: LIB=filesystem LAYOUT=tagged-1.66 THREADING=multi,single Boost_USE_MULTITHREADED=OFF
 
+    # staged
+    - env: LIB=filesystem STAGE=1
+    - env: LIB=filesystem STAGE=1
+      os: osx
+    - env: LIB=filesystem UBP=1 STAGE=1
+    - env: LIB=filesystem UBP=1 STAGE=1
+      os: osx
+
     # Boost_INCLUDE_DIRS, old style
     - env: LIB=headers
 
@@ -97,6 +105,8 @@ matrix:
     - env: LIB=container UBP=1
     - env: LIB=iostreams
     - env: LIB=iostreams UBP=1
+    - env: LIB=iostreams STAGE=1
+    - env: LIB=iostreams UBP=1 STAGE=1
     - env: LIB=log
     - env: LIB=log UBP=1
     - env: LIB=program_options
@@ -129,20 +139,22 @@ install:
   - cp -r $TRAVIS_BUILD_DIR/* tools/boost_install
   - ./bootstrap.sh
   - ./b2 headers
-  - ./b2 -j3 --prefix=$HOME/.local --with-headers ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} install
+  - if [ -z "$STAGE" ]; then ./b2 -j3 --prefix=$HOME/.local --with-headers ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} install; fi
 
 script:
   - |-
     echo "using python : 2.7 ;" >> ~/user-config.jam
   - |-
     echo "using python : 3.5 ;" >> ~/user-config.jam
-  - ./b2 -j3 --prefix=$HOME/.local --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} ${THREADING:+threading=$THREADING} install
+  - if [ -z "$STAGE" ]; then export B2_INSTALL="--prefix=$HOME/.local install"; fi
+  - ./b2 -j3 --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} ${THREADING:+threading=$THREADING} ${B2_INSTALL}
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
-  - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
+  - if [ -z "$STAGE" ]; then export CMAKE_INSTALL="-DCMAKE_INSTALL_PREFIX=~/.local"; fi
+  - cmake ${CMAKE_INSTALL} -DUSE_STAGED_BOOST=${STAGE-0} -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
   - cmake --build .
-  - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
-  - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$DYLD_LIBRARY_PATH
+  - export LD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$LD_LIBRARY_PATH
+  - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$DYLD_LIBRARY_PATH
   - cmake --build . --target check
 
 notifications:
