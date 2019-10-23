@@ -36,15 +36,14 @@ environment:
   - LIB: iostreams
     TOOLSET: msvc-14.1
     UBP: 1
+  - LIB: iostreams
+    TOOLSET: msvc-14.1
+    UBP: 1
+    STAGE: 1
   - LIB: log
     TOOLSET: msvc-14.1
   - LIB: python
     TOOLSET: msvc-14.1
-    PYTHON: 2.7,3.6,3.7
-  - LIB: python
-    UBP: 1
-    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    TOOLSET: msvc-14.2
     PYTHON: 2.7,3.6,3.7
   - LIB: serialization
     UBP: 1
