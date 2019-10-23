@@ -800,7 +800,7 @@ rule generate-cmake-config-version ( project name : property-set : sources * )
 
 # install-cmake-config-
 
-local rule install-cmake-config- ( location : includedir : libdir : version : name )
+local rule install-cmake-config- ( install-or-stage : location : includedir : libdir : version : name )
 {
     #.debug install-cmake-config- $(name) ;
 
@@ -813,19 +813,73 @@ local rule install-cmake-config- ( location : includedir : libdir : version : na
         library-type = INTERFACE ;
     }
 
-    local reqs = <name>$(name) <version>$(version) <location>$(loc) <library-type>$(library-type) <boost-install.includedir>$(includedir) <boost-install.libdir>$(libdir) ;
+    local reqs = <name>$(name) <version>$(version) <library-type>$(library-type) <boost-install.includedir>$(includedir) <boost-install.libdir>$(libdir) ;
 
     local r ;
 
-    r += [ generate $(name)-config.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config $(reqs) ] ;
-    r += [ generate $(name)-config-version.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config-version $(reqs) ] ;
+    r += [ generate $(install-or-stage)/$(name)-config.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config $(reqs) ] ;
+    r += [ install $(install-or-stage)-$(name)-config.cmake : $(install-or-stage)/$(name)-config.cmake : <location>$(loc) ] ;
+
+    r += [ generate $(install-or-stage)/$(name)-config-version.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config-version $(reqs) ] ;
+    r += [ install $(install-or-stage)-$(name)-config-version.cmake : $(install-or-stage)/$(name)-config-version.cmake : <location>$(loc) ] ;
 
     if $(library-type) != INTERFACE
     {
-        r += [ generate $(name)-variant.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-variant $(reqs) ] ;
+        local v = [ generate $(install-or-stage)/$(name)-variant.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-variant $(reqs) ] ;
+        r += $(v) ;
+        r += [ install $(install-or-stage)-$(name)-config-variant.cmake : $(v) : <location>$(loc) ] ;
     }
 
     return $(r) ;
+}
+
+# install-or-stage-cmake-config
+
+rule install-or-stage-cmake-config ( name * : install-or-stage : includedir : libdir : cmakedir )
+{
+    local p = [ project.current ] ;
+
+    if "--no-cmake-config" in [ modules.peek : ARGV ]
+    {
+        alias $(install-or-stage)-cmake-config ;
+        $(p).mark-target-as-explicit $(install-or-stage)-cmake-config ;
+    }
+    else
+    {
+        local BOOST_VERSION = [ modules.peek boostcpp : BOOST_VERSION ] ;
+
+        local configs ;
+
+        for local nm in $(name)
+        {
+            configs += [ install-cmake-config- $(install-or-stage) : $(cmakedir) : $(includedir) : $(libdir) : $(BOOST_VERSION) : $(nm) ] ;
+        }
+
+        # Target install/stage-detect-toolset
+
+        local boost-install-dir = [ modules.binding $(__name__) ] ;
+        boost-install-dir = $(boost-install-dir:D) ;
+
+        install $(install-or-stage)-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(BOOST_VERSION).cmake ;
+        $(p).mark-target-as-explicit $(install-or-stage)-detect-toolset ;
+
+        # Target install/stage-boost-config
+
+        install $(install-or-stage)-boost-config : $(boost-install-dir)/BoostConfig.cmake : <location>$(cmakedir)/Boost-$(BOOST_VERSION) ;
+        $(p).mark-target-as-explicit $(install-or-stage)-boost-config ;
+
+        # Target install/stage-boost-config-version
+
+        project.load $(boost-install-dir) ;
+
+        install $(install-or-stage)-boost-config-version : /boost/tools/boost_install//BoostConfigVersion.cmake : <location>$(cmakedir)/Boost-$(BOOST_VERSION) ;
+        $(p).mark-target-as-explicit $(install-or-stage)-boost-config-version ;
+
+        # Target install/stage-cmake-config
+
+        alias $(install-or-stage)-cmake-config : $(configs) $(install-or-stage)-detect-toolset $(install-or-stage)-boost-config $(install-or-stage)-boost-config-version ;
+        $(p).mark-target-as-explicit $(install-or-stage)-cmake-config ;
+    }
 }
 
 # install-cmake-config
@@ -834,69 +888,29 @@ rule install-cmake-config ( name * )
 {
     #.debug install-cmake-config $(name) ;
 
-    if "--no-cmake-config" in [ modules.peek : ARGV ]
+    local includedir = [ boost-install-dirs.includedir ] ;
+    local libdir = [ boost-install-dirs.libdir ] ;
+    local cmakedir = [ boost-install-dirs.cmakedir ] ;
+    local header-subdir = [ boost-install-dirs.header-subdir ] ;
+
+    if $(header-subdir)
     {
-        local p = [ project.current ] ;
-
-        alias install-detect-toolset ;
-        $(p).mark-target-as-explicit install-detect-toolset ;
-
-        alias install-cmake-config ;
-        $(p).mark-target-as-explicit install-cmake-config ;
+        includedir = $(includedir)/$(header-subdir) ;
     }
-    else
-    {
-        local BOOST_VERSION = [ modules.peek boostcpp : BOOST_VERSION ] ;
 
-        local includedir = [ boost-install-dirs.includedir ] ;
-        local libdir = [ boost-install-dirs.libdir ] ;
-        local cmakedir = [ boost-install-dirs.cmakedir ] ;
-        local header-subdir = [ boost-install-dirs.header-subdir ] ;
+    includedir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(includedir) ] ] ;
+    libdir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(libdir) ] ] ;
 
-        if $(header-subdir)
-        {
-            includedir = $(includedir)/$(header-subdir) ;
-        }
-
-        includedir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(includedir) ] ] ;
-        libdir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(libdir) ] ] ;
-
-        local configs ;
-
-        for local nm in $(name)
-        {
-            configs += [ install-cmake-config- $(cmakedir) : $(includedir) : $(libdir) : $(BOOST_VERSION) : $(nm) ] ;
-        }
-
-        local p = [ project.current ] ;
-
-        # Target install-detect-toolset
-
-        local boost-install-dir = [ modules.binding $(__name__) ] ;
-        boost-install-dir = $(boost-install-dir:D) ;
-
-        install install-detect-toolset : $(boost-install-dir)/BoostDetectToolset.cmake : <location>$(cmakedir) <name>BoostDetectToolset-$(BOOST_VERSION).cmake ;
-        $(p).mark-target-as-explicit install-detect-toolset ;
-
-        # Target install-boost-config
-
-        install install-boost-config : $(boost-install-dir)/BoostConfig.cmake : <location>$(cmakedir)/Boost-$(BOOST_VERSION) ;
-        $(p).mark-target-as-explicit install-boost-config ;
-
-        # Target install-boost-config-version
-
-        generate BoostConfigVersion.cmake : : <generating-rule>@boost-install%generate-cmake-config-version <name>Boost <version>$(BOOST_VERSION) <location>$(cmakedir)/Boost-$(BOOST_VERSION) ;
-        $(p).mark-target-as-explicit BoostConfigVersion.cmake ;
-
-        alias install-boost-config-version : BoostConfigVersion.cmake ;
-        $(p).mark-target-as-explicit install-boost-config-version ;
-
-        # Target install-cmake-config
-
-        alias install-cmake-config : $(configs) install-detect-toolset install-boost-config install-boost-config-version ;
-        $(p).mark-target-as-explicit install-cmake-config ;
-    }
+    install-or-stage-cmake-config $(name) : install : $(includedir) : $(libdir) : $(cmakedir) ;
 }
+
+rule stage-cmake-config ( name * )
+{
+    local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
+    install-or-stage-cmake-config $(name) : stage : ../../.. : .. : $(stage-locate)/lib/cmake ;
+}
+
+# stage-cmake-config
 
 # collect-targets: Returns the targets and all their dependencies.
 # Copied from stage.jam
@@ -1001,6 +1015,8 @@ rule boost-install ( libraries * )
 
     local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
 
+    stage-cmake-config $(libraries) ;
+
     install stage-libraries-static : $(libraries) : <location>$(stage-locate)/lib <install-dependencies>on <install-type>STATIC_LIB ;
     $(p).mark-target-as-explicit stage-libraries-static ;
 
@@ -1010,6 +1026,6 @@ rule boost-install ( libraries * )
     generate stage-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>stage ;
     $(p).mark-target-as-explicit stage-dependencies ;
 
-    alias stage : stage-libraries-static stage-libraries-shared stage-dependencies ;
+    alias stage : stage-libraries-static stage-libraries-shared stage-cmake-config stage-dependencies ;
     $(p).mark-target-as-explicit stage ;
 }
