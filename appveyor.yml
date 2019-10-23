@@ -24,6 +24,13 @@ environment:
   - LIB: filesystem
     LAYOUT: tagged
     TOOLSET: msvc-14.0
+  - LIB: filesystem
+    TOOLSET: msvc-14.1
+    STAGE: 1
+  - LIB: filesystem
+    UBP: 1
+    TOOLSET: msvc-14.1
+    STAGE: 1
   - LIB: headers
     TOOLSET: msvc-14.1
   - LIB: iostreams
@@ -36,7 +43,8 @@ environment:
     PYTHON: 2.7,3.6,3.7
   - LIB: python
     UBP: 1
-    TOOLSET: msvc-14.1
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    TOOLSET: msvc-14.2
     PYTHON: 2.7,3.6,3.7
   - LIB: serialization
     UBP: 1
@@ -78,12 +86,15 @@ test_script:
   - if not "%PYTHON%" == "" SET PYTHON=python=%PYTHON%
   - set ZLIB_SOURCE=%CD%\tools\boost_install\test\iostreams\zlib-1.2.11
   - set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.6
-  - b2 -j3 -d0 --prefix=C:\projects\.local --with-headers %TOOLSET% %LAYOUT% %PYTHON% install
-  - b2 -j3 --prefix=C:\projects\.local --with-%LIB% %TOOLSET% %LAYOUT% %PYTHON% install
+  - if "%STAGE%" == "" set B2_INSTALL=--prefix=C:\projects\.local install
+  - b2 -j3 -d0 --with-headers %TOOLSET% %LAYOUT% %PYTHON% %B2_INSTALL%
+  - b2 -j3 --with-%LIB% %TOOLSET% %LAYOUT% %PYTHON% %B2_INSTALL%
   - cd tools\boost_install\test\%LIB%
   - mkdir __build__ && cd __build__
   - if "%UBP%" == "" SET UBP=0
-  - cmake -DCMAKE_INSTALL_PREFIX=C:\projects\.local -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON ..
+  - if "%STAGE%" == "" SET CMAKE_INSTALL=-DCMAKE_INSTALL_PREFIX=C:\projects\.local
+  - if NOT "%STAGE%" == "" SET CMAKE_INSTALL=-DUSE_STAGED_BOOST=1
+  - cmake -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON %CMAKE_INSTALL% ..
   - PATH %PATH%;C:\projects\.local\lib
   - cmake --build . --config Debug && cmake --build . --config Debug --target check
   - cmake --build . --config Release && cmake --build . --config Release --target check
