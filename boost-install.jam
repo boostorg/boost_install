@@ -842,30 +842,37 @@ local rule install-cmake-config- ( install-or-stage : location : includedir : li
 {
     #.debug install-cmake-config- $(name) ;
 
-    local loc = $(location)/$(name)-$(version) ;
-
-    local library-type = UNKNOWN ;
-
-    if $(name) = boost_headers || $(name) = boost_math || $(name) = boost_exception
-    {
-        library-type = INTERFACE ;
-    }
-
-    local reqs = <name>$(name) <version>$(version) <library-type>$(library-type) <boost-install.cmakedir>$(location) <boost-install.includedir>$(includedir) <boost-install.libdir>$(libdir) ;
-
     local r ;
 
-    r += [ generate $(install-or-stage)/$(name)-config.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config $(reqs) ] ;
-    r += [ install $(install-or-stage)-$(name)-config.cmake : $(install-or-stage)/$(name)-config.cmake : <location>$(loc) ] ;
-
-    r += [ generate $(install-or-stage)/$(name)-config-version.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config-version $(reqs) ] ;
-    r += [ install $(install-or-stage)-$(name)-config-version.cmake : $(install-or-stage)/$(name)-config-version.cmake : <location>$(loc) ] ;
-
-    if $(library-type) != INTERFACE
+    if [ MATCH boost_(.*) : $(name) ]
     {
-        local v = [ generate $(install-or-stage)/$(name)-variant.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-variant $(reqs) ] ;
-        r += $(v) ;
-        r += [ install $(install-or-stage)-$(name)-config-variant.cmake : $(v) : <location>$(loc) ] ;
+        local loc = $(location)/$(name)-$(version) ;
+
+        local library-type = UNKNOWN ;
+
+        if $(name) = boost_headers || $(name) = boost_math || $(name) = boost_exception
+        {
+            library-type = INTERFACE ;
+        }
+
+        local reqs = <name>$(name) <version>$(version) <library-type>$(library-type) <boost-install.cmakedir>$(location) <boost-install.includedir>$(includedir) <boost-install.libdir>$(libdir) ;
+
+        r += [ generate $(install-or-stage)/$(name)-config.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config $(reqs) ] ;
+        r += [ install $(install-or-stage)-$(name)-config.cmake : $(install-or-stage)/$(name)-config.cmake : <location>$(loc) ] ;
+
+        r += [ generate $(install-or-stage)/$(name)-config-version.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-config-version $(reqs) ] ;
+        r += [ install $(install-or-stage)-$(name)-config-version.cmake : $(install-or-stage)/$(name)-config-version.cmake : <location>$(loc) ] ;
+
+        if $(library-type) != INTERFACE
+        {
+            local v = [ generate $(install-or-stage)/$(name)-variant.cmake : $(name) : <generating-rule>@boost-install%generate-cmake-variant $(reqs) ] ;
+            r += $(v) ;
+            r += [ install $(install-or-stage)-$(name)-config-variant.cmake : $(v) : <location>$(loc) ] ;
+        }
+    }
+    else
+    {
+        .info "target '$(name)' not prefixed by 'boost_', omitting CMake config" ;
     }
 
     return $(r) ;
