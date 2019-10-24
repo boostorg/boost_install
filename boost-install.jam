@@ -846,6 +846,9 @@ rule install-or-stage-cmake-config ( name * : install-or-stage : includedir : li
     }
     else
     {
+        includedir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(includedir) ] ] ;
+        libdir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(libdir) ] ] ;
+
         local BOOST_VERSION = [ modules.peek boostcpp : BOOST_VERSION ] ;
 
         local configs ;
@@ -898,16 +901,18 @@ rule install-cmake-config ( name * )
         includedir = $(includedir)/$(header-subdir) ;
     }
 
-    includedir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(includedir) ] ] ;
-    libdir = [ path.relative-to [ path.make $(cmakedir) ] [ path.make $(libdir) ] ] ;
-
     install-or-stage-cmake-config $(name) : install : $(includedir) : $(libdir) : $(cmakedir) ;
 }
 
 rule stage-cmake-config ( name * )
 {
     local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
-    install-or-stage-cmake-config $(name) : stage : ../../.. : .. : $(stage-locate)/lib/cmake ;
+
+    local includedir = [ modules.peek boostcpp : BOOST_ROOT ] ;
+    local libdir = $(stage-locate)/lib ;
+    local cmakedir = $(stage-locate)/lib/cmake ;
+
+    install-or-stage-cmake-config $(name) : stage : $(includedir) : $(libdir) : $(cmakedir) ;
 }
 
 # stage-cmake-config
