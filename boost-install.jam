@@ -725,6 +725,17 @@ rule generate-cmake-config- ( target : sources * : properties * )
             ""
             : true ;
         }
+
+        if $(name) = boost_mpi
+        {
+            print.text
+
+            "include(CMakeFindDependencyMacro)"
+            "find_dependency(MPI)"
+            "set_property(TARGET $(ltarget) APPEND PROPERTY INTERFACE_LINK_LIBRARIES MPI::MPI_C)"
+            ""
+            : true ;
+        }
     }
     else
     {
