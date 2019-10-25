@@ -18,6 +18,11 @@ env:
   matrix:
     - BOGUS_JOB=true
 
+addons:
+  apt:
+    packages:
+      - libopenmpi-dev
+
 matrix:
   exclude:
     - env: BOGUS_JOB=true
@@ -109,6 +114,8 @@ matrix:
     - env: LIB=iostreams UBP=1 STAGE=1
     - env: LIB=log
     - env: LIB=log UBP=1
+    - env: LIB=mpi
+    - env: LIB=mpi UBP=1
     - env: LIB=program_options
     - env: LIB=program_options UBP=1
     - env: LIB=python PYTHON=2.7,3.5
@@ -146,6 +153,8 @@ script:
     echo "using python : 2.7 ;" >> ~/user-config.jam
   - |-
     echo "using python : 3.5 ;" >> ~/user-config.jam
+  - |-
+    echo "using mpi ;" >> ~/user-config.jam
   - if [ -z "$STAGE" ]; then export B2_INSTALL="--prefix=$HOME/.local install"; fi
   - ./b2 -j3 --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} ${THREADING:+threading=$THREADING} ${B2_INSTALL}
   - cd tools/boost_install/test/$LIB
