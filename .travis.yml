@@ -114,8 +114,8 @@ matrix:
     - env: LIB=iostreams UBP=1 STAGE=1
     - env: LIB=log
     - env: LIB=log UBP=1
-    - env: LIB=mpi
-    - env: LIB=mpi UBP=1
+    - env: LIB=mpi CXXSTD=11
+    - env: LIB=mpi UBP=1 CXXSTD=11
     - env: LIB=program_options
     - env: LIB=program_options UBP=1
     - env: LIB=python PYTHON=2.7,3.5
@@ -156,7 +156,7 @@ script:
   - |-
     echo "using mpi ;" >> ~/user-config.jam
   - if [ -z "$STAGE" ]; then export B2_INSTALL="--prefix=$HOME/.local install"; fi
-  - ./b2 -j3 --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} ${THREADING:+threading=$THREADING} ${B2_INSTALL}
+  - ./b2 -j3 --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} ${THREADING:+threading=$THREADING} ${CXXSTD:+cxxstd=$CXXSTD} ${B2_INSTALL}
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
   - if [ -z "$STAGE" ]; then export CMAKE_INSTALL="-DCMAKE_INSTALL_PREFIX=~/.local"; fi
