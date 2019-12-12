@@ -365,8 +365,8 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-        "set_target_properties($(target) PROPERTIES"
-        "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_$(lname:U)_DYN_LINK\""
+        "set_property(TARGET $(target) APPEND"
+        "  PROPERTY INTERFACE_COMPILE_DEFINITIONS \"BOOST_$(lname:U)_DYN_LINK\""
         "  )"
         ""
         : true ;
