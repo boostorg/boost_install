@@ -1065,9 +1065,66 @@ rule generate-dependencies ( project name ? : property-set : sources * )
 
 # boost-install
 
+local rule install-stage-subdir ( properties * )
+{
+    local ps = [ property-set.create $(properties) ] ;
+
+    local r = [ boostcpp.tag boost : STATIC_LIB : $(ps) ] ;
+
+    r = $(r:S=) ;
+
+    local r2 = [ MATCH "lib(.*)" : $(r) ] ;
+    if $(r2) { r = $(r2) ; }
+
+    local python = [ $(ps).get <python> ] ;
+
+    if $(python)
+    {
+        r = $(r:B=$(r:B)-py$(python)) ;
+    }
+
+    return $(r) ;
+}
+
+rule stage-subdir ( properties * )
+{
+    local r = [ install-stage-subdir $(properties) ] ;
+
+    local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
+
+    return <location>$(stage-locate)/lib/$(r) ;
+}
+
+rule install-subdir ( properties * )
+{
+    local r = [ install-stage-subdir $(properties) ] ;
+
+    local paths = [ package.paths Boost : $(properties) ] ;
+    local libdir = [ $(paths).libdir ] ;
+
+    return <location>$(libdir)/$(r) ;
+}
+
 rule boost-install ( libraries * )
 {
     .debug boost-install $(libraries) ;
+
+    local l2 = ;
+    local unprefixed = ;
+
+    for local lib in $(libraries)
+    {
+        if [ MATCH boost_(.*) : $(lib) ]
+        {
+            l2 += $(lib) ;
+        }
+        else
+        {
+            unprefixed += $(lib) ;
+        }
+    }
+
+    libraries = $(l2) ;
 
     # Target install
 
@@ -1082,12 +1139,20 @@ rule boost-install ( libraries * )
 
     $(p).mark-target-as-explicit install-libraries ;
 
+    # Install unprefixed
+
+    install install-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%install-subdir ;
+    $(p).mark-target-as-explicit install-unprefixed-static ;
+
+    install install-unprefixed-shared : $(unprefixed) : <install-type>SHARED_LIB <conditional>@boost-install%install-subdir ;
+    $(p).mark-target-as-explicit install-unprefixed-shared ;
+
     install-cmake-config $(libraries) ;
 
     generate install-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>install ;
     $(p).mark-target-as-explicit install-dependencies ;
 
-    alias install : install-libraries install-cmake-config install-dependencies ;
+    alias install : install-libraries install-unprefixed-static install-unprefixed-shared install-cmake-config install-dependencies ;
     $(p).mark-target-as-explicit install ;
 
     # Target stage
@@ -1102,9 +1167,15 @@ rule boost-install ( libraries * )
     install stage-libraries-shared : $(libraries) : <location>$(stage-locate)/lib <install-dependencies>on <install-type>SHARED_LIB ;
     $(p).mark-target-as-explicit stage-libraries-shared ;
 
+    install stage-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%stage-subdir ;
+    $(p).mark-target-as-explicit stage-unprefixed-static ;
+
+    install stage-unprefixed-shared : $(unprefixed) : <install-type>SHARED_LIB <conditional>@boost-install%stage-subdir ;
+    $(p).mark-target-as-explicit stage-unprefixed-shared ;
+
     generate stage-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>stage ;
     $(p).mark-target-as-explicit stage-dependencies ;
 
-    alias stage : stage-libraries-static stage-libraries-shared stage-cmake-config stage-dependencies ;
+    alias stage : stage-libraries-static stage-libraries-shared stage-unprefixed-static stage-unprefixed-shared stage-cmake-config stage-dependencies ;
     $(p).mark-target-as-explicit stage ;
 }
