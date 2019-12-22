@@ -1139,8 +1139,6 @@ rule boost-install ( libraries * )
 
     $(p).mark-target-as-explicit install-libraries ;
 
-    # Install unprefixed
-
     install install-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%install-subdir ;
     $(p).mark-target-as-explicit install-unprefixed-static ;
 
