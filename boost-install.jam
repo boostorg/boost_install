@@ -416,7 +416,7 @@ local rule tag ( name : type ? : property-set )
 
     if $(python)
     {
-        r = $(r:B=$(r:B)-py$(python)) ;
+        r = $(r:B=$(r:B)-python$(python)) ;
     }
 
     .debug "  result=" $(r) ;
