@@ -9,14 +9,25 @@
 # It's roughly, but not perfectly, compatible with the behavior
 # of find_package(Boost) as provided by FindBoost.cmake.
 #
-# A typical use might be
+# A typical use might be:
 #
-# find_package(Boost 1.70 REQUIRED COMPONENTS filesystem regex PATHS C:/Boost)
+# find_package(Boost 1.73 REQUIRED COMPONENTS filesystem regex PATHS C:/Boost)
 #
 # On success, the above invocation would define the targets Boost::headers,
 # Boost::filesystem and Boost::regex. Boost::headers represents all
 # header-only libraries. An alias, Boost::boost, for Boost::headers is
 # provided for compatibility.
+#
+# A special component "ALL" is availabe which when listed as the only component
+# in the call to find_package instructs this configuration file to search for
+# all components.
+# Additionally, a variable BOOST_ALL_TARGETS will then be set, too, which
+# contains the names of all created targets.
+#
+# The typical use would then be the (omitting the COMPONENTS keyword which is
+# optional if the REQUIRED keyword is given):
+#
+# find_package(Boost 1.73 REQUIRED ALL PATHS C:/Boost)
 #
 # Since Boost libraries can coexist in many variants - 32/64 bit,
 # static/dynamic runtime, debug/release, the following variables can be used
@@ -132,6 +143,7 @@ macro(boost_find_component comp req)
   if(__boost_comp_found)
 
     list(APPEND Boost_LIBRARIES Boost::${__boost_comp_nv})
+    list(REMOVE_DUPLICATES Boost_LIBRARIES)
     set(Boost_${_BOOST_COMP}_LIBRARY Boost::${__boost_comp_nv})
 
     if(NOT "${comp}" STREQUAL "${__boost_comp_nv}" AND NOT TARGET Boost::${comp})
@@ -150,6 +162,54 @@ macro(boost_find_component comp req)
   unset(__boost_comp_nv)
   unset(__boost_comp_found)
   unset(_BOOST_COMP)
+
+endmacro()
+
+macro(boost_find_all_components req)
+
+  if(Boost_DEBUG)
+    if(${req})
+      message(STATUS "BoostConfig: All components are required.")
+    else()
+      message(STATUS "BoostConfig: All components are optionally requested.")
+    endif()
+  endif()
+
+  # Search for all available component-configuration directories...
+  file(GLOB __boost_all_components
+       LIST_DIRECTORIES true RELATIVE "${CMAKE_CURRENT_LIST_DIR}/.."
+       "${CMAKE_CURRENT_LIST_DIR}/../boost_*-${Boost_VERSION}")
+  # ...and extract component names from it.
+  string(REGEX REPLACE "boost_([_a-z0-9]+)-${Boost_VERSION}" "\\1"
+         __boost_all_components "${__boost_all_components}")
+  list(REMOVE_ITEM __boost_all_components "headers")
+  list(LENGTH __boost_all_components __boost_all_components_count)
+
+  if(Boost_DEBUG OR Boost_VERBOSE)
+    if(${__boost_all_components_count} EQUAL 0)
+      message(STATUS "BoostConfig: Following components will be searched: N/A")
+    else()
+      message(STATUS "BoostConfig: Following components will be searched:")
+      foreach(__boost_comp IN LISTS __boost_all_components)
+        message(STATUS "  ${__boost_comp}")
+      endforeach()
+    endif()
+  endif()
+
+  # Try to find each component.
+  foreach(__boost_comp IN LISTS __boost_all_components)
+
+    boost_find_component(${__boost_comp} ${req})
+
+    # Append to list of all targets (if found).
+    if(Boost_${_boost_comp}_FOUND)
+      list(APPEND Boost_ALL_TARGETS Boost::${__boost_comp})
+    endif()
+
+  endforeach()
+
+  unset(__boost_all_components_count)
+  unset(__boost_all_components)
 
 endmacro()
 
@@ -180,11 +240,31 @@ set(Boost_LIBRARIES "")
 
 # Find components
 
-foreach(__boost_comp IN LISTS Boost_FIND_COMPONENTS)
+list(REMOVE_DUPLICATES Boost_FIND_COMPONENTS)
 
-  boost_find_component(${__boost_comp} ${Boost_FIND_REQUIRED_${__boost_comp}})
+if("ALL" IN_LIST Boost_FIND_COMPONENTS)
 
-endforeach()
+  # Make sure "ALL" is the only requested component.
+  list(LENGTH Boost_FIND_COMPONENTS __boost_find_components_count)
+  if(NOT ${__boost_find_components_count} EQUAL 1)
+    unset(__boost_find_components_count)
+    message(SEND_ERROR "You can only request ALL Boost components or explicit ones, not both!\n"
+                       "Will ignore explicit components for now! Still, you must fix that.")
+  endif()
+
+  set(Boost_ALL_TARGETS Boost::headers)
+
+  boost_find_all_components(${Boost_FIND_REQUIRED_ALL})
+
+else()
+
+  foreach(__boost_comp IN LISTS Boost_FIND_COMPONENTS)
+
+    boost_find_component(${__boost_comp} ${Boost_FIND_REQUIRED_${__boost_comp}})
+
+  endforeach()
+
+endif()
 
 # Compatibility targets
 
@@ -198,4 +278,10 @@ if(NOT TARGET Boost::boost)
   add_library(Boost::disable_autolinking INTERFACE IMPORTED)
   add_library(Boost::dynamic_linking INTERFACE IMPORTED)
 
+endif()
+
+# Compatibility variable when using meta-component "ALL"
+
+if("ALL" IN_LIST Boost_FIND_COMPONENTS)
+  set(Boost_ALL_FOUND ${boost_headers_FOUND})
 endif()
