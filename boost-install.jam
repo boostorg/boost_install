@@ -659,7 +659,7 @@ rule generate-cmake-config- ( target : sources * : properties * )
             ""
             "get_target_property(__boost_configs $(ltarget) IMPORTED_CONFIGURATIONS)"
             ""
-            "if(__boost_variants AND NOT __boost_configs)"
+            "if(NOT __boost_configs)"
             "  set(__boost_message \"No suitable build variant has been found.\")"
             "  if(__boost_skipped)"
             "    set(__boost_message \"${__boost_message}\\nThe following variants have been tried and rejected:\")"
