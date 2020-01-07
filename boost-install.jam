@@ -1080,7 +1080,7 @@ local rule install-stage-subdir ( properties * )
 
     if $(python)
     {
-        r = $(r:B=$(r:B)-py$(python)) ;
+        r = $(r:B=$(r:B)-python$(python)) ;
     }
 
     return $(r) ;
