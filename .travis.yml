@@ -98,6 +98,9 @@ matrix:
     - env: LIB=filesystem UBP=1 STAGE=1
       os: osx
 
+    # ALL
+    - env: LIB=filesystem USE_ALL_COMPONENTS=1
+
     # Boost_INCLUDE_DIRS, old style
     - env: LIB=headers
 
@@ -114,6 +117,7 @@ matrix:
     - env: LIB=iostreams UBP=1 STAGE=1
     - env: LIB=log
     - env: LIB=log UBP=1
+    - env: LIB=log USE_ALL_COMPONENTS=1
     - env: LIB=mpi CXXSTD=11
     - env: LIB=mpi UBP=1 CXXSTD=11
     - env: LIB=program_options
@@ -134,6 +138,33 @@ matrix:
     - env: LIB=thread UBP=1
     - env: LIB=wave
     - env: LIB=wave UBP=1
+    - env: ALL=1
+      install:
+        - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
+        - cd ..
+        - git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+        - cd boost-root
+        - git submodule update --init --jobs 3
+        - rm -rf tools/boost_install/*
+        - cp -r $TRAVIS_BUILD_DIR/* tools/boost_install
+        - ./bootstrap.sh
+        - ./b2 headers
+        - |-
+          echo "using python : 2.7 ;" >> ~/user-config.jam
+        - |-
+          echo "using python : 3.5 ;" >> ~/user-config.jam
+        - |-
+          echo "using mpi ;" >> ~/user-config.jam
+        - ./b2 -j3 --prefix=$HOME/.local python=2.7,3.5 install
+      script:
+        - cd tools/boost_install/test/filesystem
+        - mkdir __build__ && cd __build__
+        - if [ -z "$STAGE" ]; then export CMAKE_INSTALL="-DCMAKE_INSTALL_PREFIX=~/.local"; fi
+        - cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_ALL_COMPONENTS=1 -DBoost_DEBUG=ON ..
+        - cmake --build .
+        - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
+        - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$DYLD_LIBRARY_PATH
+        - cmake --build . --target check
 
 install:
   - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
@@ -160,7 +191,7 @@ script:
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
   - if [ -z "$STAGE" ]; then export CMAKE_INSTALL="-DCMAKE_INSTALL_PREFIX=~/.local"; fi
-  - cmake ${CMAKE_INSTALL} -DUSE_STAGED_BOOST=${STAGE-0} -DUSE_BOOST_PACKAGE=${UBP-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
+  - cmake ${CMAKE_INSTALL} -DUSE_STAGED_BOOST=${STAGE-0} -DUSE_BOOST_PACKAGE=${UBP-0} -DUSE_ALL_COMPONENTS=${USE_ALL_COMPONENTS-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$LD_LIBRARY_PATH
   - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$DYLD_LIBRARY_PATH
