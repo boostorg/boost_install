@@ -324,6 +324,17 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         ""
         : true ;
 
+    if $(python)
+    {
+        print.text
+
+            "if(NOT Boost_PYTHON_VERSION)"
+            "  set(Boost_PYTHON_VERSION \"$(python)\")"
+            "endif()"
+            ""
+            : true ;
+    }
+
     local lname = [ MATCH boost_(.*) : $(name) ] ;
     .info "  lname=" $(lname) ;
 
