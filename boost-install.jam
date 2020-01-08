@@ -329,6 +329,9 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         print.text
 
             "if(NOT Boost_PYTHON_VERSION)"
+            "  if(Boost_DEBUG)"
+            "    message(STATUS \"  Setting Boost_PYTHON_VERSION to $(python)\")"
+            "  endif()"
             "  set(Boost_PYTHON_VERSION \"$(python)\")"
             "endif()"
             ""
