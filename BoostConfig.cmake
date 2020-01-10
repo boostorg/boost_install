@@ -236,7 +236,7 @@ if("ALL" IN_LIST Boost_FIND_COMPONENTS)
   # Make sure "ALL" is the only requested component.
   list(LENGTH Boost_FIND_COMPONENTS __boost_find_components_count)
   if(NOT ${__boost_find_components_count} EQUAL 1)
-    message(WARNING "ALL cannot be combined with named components; the named components will be ignored.")
+    message(AUTHOR_WARNING "ALL cannot be combined with named components; the named components will be ignored.")
   endif()
 
   unset(__boost_find_components_count)
