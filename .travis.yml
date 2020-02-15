@@ -98,6 +98,9 @@ matrix:
     - env: LIB=filesystem UBP=1 STAGE=1
       os: osx
 
+    - env: LIB=filesystem UBP=1 STAGE=1 STAGEDIR=stage64-gcc5
+    - env: LIB=filesystem UBP=1 STAGE=1 STAGEDIR=.
+
     # ALL
     - env: LIB=filesystem USE_ALL_COMPONENTS=1
 
@@ -187,11 +190,11 @@ script:
   - |-
     echo "using mpi ;" >> ~/user-config.jam
   - if [ -z "$STAGE" ]; then export B2_INSTALL="--prefix=$HOME/.local install"; fi
-  - ./b2 -j3 --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} ${THREADING:+threading=$THREADING} ${CXXSTD:+cxxstd=$CXXSTD} ${B2_INSTALL}
+  - ./b2 -j3 --with-$LIB ${LAYOUT:+--layout=$LAYOUT} ${STAGEDIR:+--stagedir=$STAGEDIR} ${TOOLSET:+toolset=$TOOLSET} ${LINK:+link=$LINK} ${PYTHON:+python=$PYTHON} ${THREADING:+threading=$THREADING} ${CXXSTD:+cxxstd=$CXXSTD} ${B2_INSTALL}
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
   - if [ -z "$STAGE" ]; then export CMAKE_INSTALL="-DCMAKE_INSTALL_PREFIX=~/.local"; fi
-  - cmake ${CMAKE_INSTALL} -DUSE_STAGED_BOOST=${STAGE-0} -DUSE_BOOST_PACKAGE=${UBP-0} -DUSE_ALL_COMPONENTS=${USE_ALL_COMPONENTS-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
+  - cmake ${CMAKE_INSTALL} -DUSE_STAGED_BOOST=${STAGE-0} ${STAGEDIR:+-DBoost_ROOT=$TRAVIS_BUILD_DIR/../boost-root/$STAGEDIR} -DUSE_BOOST_PACKAGE=${UBP-0} -DUSE_ALL_COMPONENTS=${USE_ALL_COMPONENTS-0} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$LD_LIBRARY_PATH
   - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$DYLD_LIBRARY_PATH
