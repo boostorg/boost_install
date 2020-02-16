@@ -1,4 +1,4 @@
-# Copyright 2018, 2019 Peter Dimov
+# Copyright 2018-2020 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -998,11 +998,9 @@ rule install-cmake-config ( name * )
 
 rule stage-cmake-config ( name * )
 {
-    local stage-locate = [ path.make [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ] ;
-
     local includedir = [ path.make [ modules.peek boostcpp : BOOST_ROOT ] ] ;
-    local libdir = $(stage-locate)/lib ;
-    local cmakedir = $(stage-locate)/lib/cmake ;
+    local libdir = [ boost-install-dirs.stage-libdir ] ;
+    local cmakedir = $(libdir)/cmake ;
 
     install-or-stage-cmake-config $(name) : stage : $(includedir) : $(libdir) : $(cmakedir) ;
 }
@@ -1108,17 +1106,16 @@ rule stage-subdir ( properties * )
 {
     local r = [ install-stage-subdir $(properties) ] ;
 
-    local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
+    local libdir = [ boost-install-dirs.stage-libdir ] ;
 
-    return <location>$(stage-locate)/lib/$(r) ;
+    return <location>$(libdir)/$(r) ;
 }
 
 rule install-subdir ( properties * )
 {
     local r = [ install-stage-subdir $(properties) ] ;
 
-    local paths = [ package.paths Boost : $(properties) ] ;
-    local libdir = [ $(paths).libdir ] ;
+    local libdir = [ boost-install-dirs.libdir ] ;
 
     return <location>$(libdir)/$(r) ;
 }
@@ -1173,14 +1170,14 @@ rule boost-install ( libraries * )
 
     # Target stage
 
-    local stage-locate = [ modules.peek boostcpp : BOOST_STAGE_LOCATE ] ;
+    local stage-libdir = [ boost-install-dirs.stage-libdir ] ;
 
     stage-cmake-config $(libraries) ;
 
-    install stage-libraries-static : $(libraries) : <location>$(stage-locate)/lib <install-dependencies>on <install-type>STATIC_LIB ;
+    install stage-libraries-static : $(libraries) : <location>$(stage-libdir) <install-dependencies>on <install-type>STATIC_LIB ;
     $(p).mark-target-as-explicit stage-libraries-static ;
 
-    install stage-libraries-shared : $(libraries) : <location>$(stage-locate)/lib <install-dependencies>on <install-type>SHARED_LIB ;
+    install stage-libraries-shared : $(libraries) : <location>$(stage-libdir) <install-dependencies>on <install-type>SHARED_LIB ;
     $(p).mark-target-as-explicit stage-libraries-shared ;
 
     install stage-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%stage-subdir ;
