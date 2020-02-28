@@ -258,7 +258,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "if(Boost_USE_DEBUG_RUNTIME)"
+            "if(\"${Boost_USE_DEBUG_RUNTIME}\" STREQUAL \"\" OR Boost_USE_DEBUG_RUNTIME)"
             "  _BOOST_SKIPPED(\"$(fname)\" \"release runtime, Boost_USE_DEBUG_RUNTIME=${Boost_USE_DEBUG_RUNTIME}\")"
             "  return()"
             "endif()"
@@ -283,7 +283,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "if(Boost_USE_MULTITHREADED)"
+            "if(\"${Boost_USE_MULTITHREADED}\" STREQUAL \"\" OR Boost_USE_MULTITHREADED)"
             "  _BOOST_SKIPPED(\"$(fname)\" \"single-threaded, Boost_USE_MULTITHREADED=${Boost_USE_MULTITHREADED}\")"
             "  return()"
             "endif()"
