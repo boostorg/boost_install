@@ -84,11 +84,17 @@ matrix:
 
     # static
     - env: LIB=filesystem Boost_USE_STATIC_LIBS=ON
+    - env: LIB=filesystem LINK=static
     - env: LIB=filesystem LINK=static Boost_USE_STATIC_LIBS=ON
 
     # threading=multi,single
+    - env: LIB=filesystem LAYOUT=tagged-1.66 THREADING=multi,single
     - env: LIB=filesystem LAYOUT=tagged-1.66 THREADING=multi,single Boost_USE_MULTITHREADED=ON
     - env: LIB=filesystem LAYOUT=tagged-1.66 THREADING=multi,single Boost_USE_MULTITHREADED=OFF
+
+    # threading=single
+    - env: LIB=filesystem THREADING=single
+    - env: LIB=filesystem THREADING=single Boost_USE_MULTITHREADED=OFF
 
     # staged
     - env: LIB=filesystem STAGE=1
