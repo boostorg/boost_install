@@ -350,7 +350,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
 
         "get_target_property(__boost_imploc $(target) IMPORTED_LOCATION_$(variant:U))"
         "if(__boost_imploc)"
-        "  message(WARNING \"Target $(target) already has an imported location '${__boost_imploc}', which will be overwritten with '${_BOOST_LIBDIR}/$(fname)'\")"
+        "  message(SEND_ERROR \"Target $(target) already has an imported location '${__boost_imploc}', which is being overwritten with '${_BOOST_LIBDIR}/$(fname)'\")"
         "endif()"
         "unset(__boost_imploc)"
         ""
