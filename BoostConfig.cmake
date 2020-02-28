@@ -39,9 +39,8 @@
 #
 # Boost_USE_DEBUG_LIBS:     When OFF, disables debug libraries.
 # Boost_USE_RELEASE_LIBS:   When OFF, disables release libraries.
-# Boost_USE_MULTITHREADED:  When ON, uses multithreaded Boost libraries.
-#                           When OFF, uses single-threaded libraries.
-#                           The default is to use either.
+# Boost_USE_MULTITHREADED:  When OFF, uses single-threaded libraries.
+#                           The default is multithreaded.
 # Boost_USE_STATIC_LIBS:    When ON, uses static Boost libraries; when OFF,
 #                           uses shared Boost libraries; when not set, uses
 #                           static on Windows, shared otherwise.

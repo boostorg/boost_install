@@ -272,7 +272,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
-            "if(NOT \"${Boost_USE_MULTITHREADED}\" STREQUAL \"\" AND NOT Boost_USE_MULTITHREADED)"
+            "if(DEFINED Boost_USE_MULTITHREADED AND NOT Boost_USE_MULTITHREADED)"
             "  _BOOST_SKIPPED(\"$(fname)\" \"multithreaded, Boost_USE_MULTITHREADED=${Boost_USE_MULTITHREADED}\")"
             "  return()"
             "endif()"
@@ -283,6 +283,11 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     {
         print.text
 
+            "if(NOT DEFINED Boost_USE_MULTITHREADED)"
+            "  _BOOST_SKIPPED(\"$(fname)\" \"single-threaded, Boost_USE_MULTITHREADED is not set and defaults to ON, set to OFF to override\")"
+            "  return()"
+            "endif()"
+            ""
             "if(Boost_USE_MULTITHREADED)"
             "  _BOOST_SKIPPED(\"$(fname)\" \"single-threaded, Boost_USE_MULTITHREADED=${Boost_USE_MULTITHREADED}\")"
             "  return()"
