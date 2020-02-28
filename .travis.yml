@@ -128,6 +128,7 @@ matrix:
     - env: LIB=log
     - env: LIB=log UBP=1
     - env: LIB=log USE_ALL_COMPONENTS=1
+    - env: LIB=log LAYOUT=tagged-1.66 THREADING=multi,single
     - env: LIB=mpi CXXSTD=11
     - env: LIB=mpi UBP=1 CXXSTD=11
     - env: LIB=program_options
