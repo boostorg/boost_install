@@ -145,6 +145,9 @@ matrix:
     - env: LIB=python PYTHON=2.7,3.5 USE_PYTHON_VERSION=2.7 USE_PYTHON_COMPONENT=python27
     - env: LIB=python PYTHON=2.7,3.5 USE_PYTHON_VERSION=3.5 USE_PYTHON_COMPONENT=python35
 
+    - env: LIB=python PYTHON=2.7,3.5 USE_PYTHON_VERSION=2.7 USE_PYTHON_COMPONENT=python2
+    - env: LIB=python PYTHON=2.7,3.5 USE_PYTHON_VERSION=3.5 USE_PYTHON_COMPONENT=python3
+
     - env: LIB=random
     - env: LIB=random UBP=1
     - env: LIB=regex
