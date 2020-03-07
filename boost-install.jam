@@ -151,6 +151,13 @@ rule generate-cmake-variant- ( target : sources * : properties * )
             "  endif()"
             "endif()"
             ""
+            "if(Boost_PYTHON_VERSION_MAJOR)"
+            "  if(NOT \"$(python)\" MATCHES \"^${Boost_PYTHON_VERSION_MAJOR}[.]\")"
+            "    _BOOST_SKIPPED(\"$(fname)\" \"$(python), Boost_PYTHON_VERSION_MAJOR=${Boost_PYTHON_VERSION_MAJOR}\")"
+            "    return()"
+            "  endif()"
+            "endif()"
+            ""
             : true ;
     }
 

@@ -120,6 +120,13 @@ macro(boost_find_component comp req)
     set(Boost_PYTHON_VERSION "${CMAKE_MATCH_2}.${CMAKE_MATCH_3}")
     set(__boost_comp_nv "${CMAKE_MATCH_1}")
 
+  elseif("${comp}" MATCHES "^(python|numpy|mpi_python)([1-9])$")
+
+    # handle python2/python3 for compatibility
+
+    set(Boost_PYTHON_VERSION_MAJOR "${CMAKE_MATCH_2}")
+    set(__boost_comp_nv "${CMAKE_MATCH_1}")
+
   else()
 
     set(__boost_comp_nv "${comp}")
