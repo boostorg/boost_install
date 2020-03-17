@@ -85,7 +85,7 @@ test_script:
   - if not "%TOOLSET%" == "" SET TOOLSET=toolset=%TOOLSET%
   - if not "%PYTHON%" == "" SET PYTHON=python=%PYTHON%
   - set ZLIB_SOURCE=%CD%\tools\boost_install\test\iostreams\zlib-1.2.11
-  - set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.6
+  - set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.8
   - if "%STAGE%" == "" set B2_INSTALL=--prefix=C:\projects\.local install
   - if "%STAGE%" == "" b2 -j3 -d0 --with-headers %TOOLSET% %LAYOUT% %PYTHON% %B2_INSTALL%
   - b2 -j3 --with-%LIB% %TOOLSET% %LAYOUT% %PYTHON% %B2_INSTALL%
