@@ -129,7 +129,7 @@ test_script:
   - if NOT "%USE_PYTHON_VERSION%" == "" SET USE_PYTHON_VERSION=-DUSE_PYTHON_VERSION=%USE_PYTHON_VERSION%
   - if NOT "%USE_STATIC_LIBS%" == "" SET USE_STATIC_LIBS=-DBoost_USE_STATIC_LIBS=%USE_STATIC_LIBS%
   - cmake -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON %USE_PYTHON_VERSION% %USE_STATIC_LIBS% %CMAKE_INSTALL% ..
-  - PATH %PATH%;C:\projects\.local\lib
+  - PATH %PATH%;C:\projects\.local\lib;C:\projects\boost-root\stage\lib
   - cmake --build . --config Debug && cmake --build . --config Debug --target check
   - cmake --build . --config Release && cmake --build . --config Release --target check
   - cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
