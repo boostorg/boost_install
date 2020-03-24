@@ -1,4 +1,4 @@
-# Copyright 2016-2019 Peter Dimov
+# Copyright 2016-2020 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -150,6 +150,9 @@ matrix:
 
     - env: LIB=random
     - env: LIB=random UBP=1
+    - env: LIB=random BUILD_SHARED_LIBS=ON
+    - env: LIB=random UBP=1 BUILD_SHARED_LIBS=ON
+
     - env: LIB=regex
     - env: LIB=regex UBP=1
     - env: LIB=serialization
@@ -215,7 +218,7 @@ script:
   - cd tools/boost_install/test/$LIB
   - mkdir __build__ && cd __build__
   - if [ -z "$STAGE" ]; then export CMAKE_INSTALL="-DCMAKE_INSTALL_PREFIX=~/.local"; fi
-  - cmake ${CMAKE_INSTALL} -DUSE_STAGED_BOOST=${STAGE-0} ${STAGEDIR:+-DBoost_ROOT=$TRAVIS_BUILD_DIR/../boost-root/$STAGEDIR} ${STAGELIBDIR:+-DBoost_ROOT=$TRAVIS_BUILD_DIR/../boost-root/$STAGELIBDIR/cmake} -DUSE_BOOST_PACKAGE=${UBP-0} -DUSE_ALL_COMPONENTS=${USE_ALL_COMPONENTS-0} ${USE_PYTHON_VERSION:+-DUSE_PYTHON_VERSION=$USE_PYTHON_VERSION} ${USE_PYTHON_COMPONENT:+-DUSE_PYTHON_COMPONENT=$USE_PYTHON_COMPONENT} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
+  - cmake ${CMAKE_INSTALL} -DUSE_STAGED_BOOST=${STAGE-0} ${STAGEDIR:+-DBoost_ROOT=$TRAVIS_BUILD_DIR/../boost-root/$STAGEDIR} ${STAGELIBDIR:+-DBoost_ROOT=$TRAVIS_BUILD_DIR/../boost-root/$STAGELIBDIR/cmake} -DUSE_BOOST_PACKAGE=${UBP-0} -DUSE_ALL_COMPONENTS=${USE_ALL_COMPONENTS-0} ${USE_PYTHON_VERSION:+-DUSE_PYTHON_VERSION=$USE_PYTHON_VERSION} ${USE_PYTHON_COMPONENT:+-DUSE_PYTHON_COMPONENT=$USE_PYTHON_COMPONENT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
   - cmake --build .
   - export LD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$LD_LIBRARY_PATH
   - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$DYLD_LIBRARY_PATH
