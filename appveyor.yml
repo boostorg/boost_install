@@ -34,6 +34,7 @@ environment:
   - LIB: filesystem
     UBP: 1
     B2_LINK: shared
+    USE_STATIC_LIBS: OFF
     TOOLSET: msvc-14.1
   - LIB: filesystem
     UBP: 1
@@ -48,6 +49,7 @@ environment:
     UBP: 1
     STAGE: 1
     B2_LINK: shared
+    USE_STATIC_LIBS: OFF
     TOOLSET: msvc-14.1
   - LIB: filesystem
     UBP: 1
