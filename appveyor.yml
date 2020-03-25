@@ -52,6 +52,10 @@ environment:
   - LIB: random
     UBP: 1
     TOOLSET: msvc-14.1
+  - LIB: random
+    UBP: 1
+    BUILD_SHARED_LIBS: ON
+    TOOLSET: msvc-14.1
   - LIB: regex
     UBP: 1
     TOOLSET: msvc-14.1
@@ -98,8 +102,10 @@ test_script:
   - if "%STAGE%" == "" SET CMAKE_INSTALL=-DCMAKE_INSTALL_PREFIX=C:\projects\.local
   - if NOT "%STAGE%" == "" SET CMAKE_INSTALL=-DUSE_STAGED_BOOST=1
   - if NOT "%USE_PYTHON_VERSION%" == "" SET USE_PYTHON_VERSION=-DUSE_PYTHON_VERSION=%USE_PYTHON_VERSION%
-  - cmake -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON %USE_PYTHON_VERSION% %CMAKE_INSTALL% ..
-  - PATH %PATH%;C:\projects\.local\lib
+  - if NOT "%USE_STATIC_LIBS%" == "" SET USE_STATIC_LIBS=-DBoost_USE_STATIC_LIBS=%USE_STATIC_LIBS%
+  - if NOT "%BUILD_SHARED_LIBS%" == "" SET BUILD_SHARED_LIBS=-DBUILD_SHARED_LIBS=%BUILD_SHARED_LIBS%
+  - cmake -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON %USE_PYTHON_VERSION% %USE_STATIC_LIBS% %BUILD_SHARED_LIBS% %CMAKE_INSTALL% ..
+  - PATH %PATH%;C:\projects\.local\lib;C:\projects\boost-root\stage\lib
   - cmake --build . --config Debug && cmake --build . --config Debug --target check
   - cmake --build . --config Release && cmake --build . --config Release --target check
   - cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
