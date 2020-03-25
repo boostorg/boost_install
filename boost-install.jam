@@ -24,6 +24,7 @@ feature.feature boost-install.dependency : : free ;
 feature.feature boost-install.cmakedir : : free ;
 feature.feature boost-install.includedir : : free ;
 feature.feature boost-install.libdir : : free ;
+feature.feature boost-install.lib-target-type : : free ;
 
 if "--verbose" in [ modules.peek : ARGV ]
 {
@@ -359,11 +360,38 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     local target = "Boost::$(lname)" ;
     .info "  target=" $(target) ;
 
+    print.text
+
+        "# Create imported target $(target)"
+        ""
+        "if(NOT TARGET $(target))"
+        "  add_library($(target) $(link:U) IMPORTED)"
+        ""
+        "  set_target_properties($(target) PROPERTIES"
+        "    INTERFACE_INCLUDE_DIRECTORIES \"\${_BOOST_INCLUDEDIR}\""
+        "    INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
+        "  )"
+        "endif()"
+        ""
+        : true ;
+
     print.text "# Target file name: $(fname)" "" : true ;
+
+    local lib-target-type = [ $(ps).get <boost-install.lib-target-type> ] ;
+    .info "  lib-target-type=" $(lib-target-type) ;
+
+    local loc-prop = LOCATION ;
+
+    if $(lib-target-type) = IMPORT_LIB
+    {
+        loc-prop = IMPLIB ;
+    }
+
+    .info "  loc-prop=" $(loc-prop) ;
 
     print.text
 
-        "get_target_property(__boost_imploc $(target) IMPORTED_LOCATION_$(variant:U))"
+        "get_target_property(__boost_imploc $(target) IMPORTED_$(loc-prop)_$(variant:U))"
         "if(__boost_imploc)"
         "  message(SEND_ERROR \"Target $(target) already has an imported location '${__boost_imploc}', which is being overwritten with '${_BOOST_LIBDIR}/$(fname)'\")"
         "endif()"
@@ -373,7 +401,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         ""
         "set_target_properties($(target) PROPERTIES"
         "  IMPORTED_LINK_INTERFACE_LANGUAGES_$(variant:U) CXX"
-        "  IMPORTED_LOCATION_$(variant:U) \"${_BOOST_LIBDIR}/$(fname)\""
+        "  IMPORTED_$(loc-prop)_$(variant:U) \"${_BOOST_LIBDIR}/$(fname)\""
         "  )"
         ""
         : true ;
@@ -517,7 +545,13 @@ rule generate-cmake-variant ( project name : property-set : sources * )
     {
         .debug "  lib-target=" [ $(lib-target).name ] ;
 
+        local lib-target-type = [ $(lib-target).type ] ;
+
+        .debug "  lib-target-type=" $(lib-target-type) ;
+
         local tag = [ tag $(name) : : $(property-set) ] ;
+
+        property-set = [ $(property-set).add-raw <boost-install.lib-target-type>$(lib-target-type) ] ;
 
         local a = [ new non-scanning-action $(lib-target) : boost-install.generate-cmake-variant- : $(property-set) ] ;
 
@@ -638,26 +672,31 @@ rule generate-cmake-config- ( target : sources * : properties * )
     }
 
     get-dir "_BOOST_INCLUDEDIR" : $(includedir) ;
-    get-dir "_BOOST_LIBDIR" : $(libdir) ;
 
-    print.text
-
-        ""
-        "# Create imported target $(ltarget)"
-        ""
-        "add_library($(ltarget) $(library-type) IMPORTED)"
-        ""
-        "set_target_properties($(ltarget) PROPERTIES"
-        "  INTERFACE_INCLUDE_DIRECTORIES \"\${_BOOST_INCLUDEDIR}\""
-        "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
-        ")"
-        ""
-        : true ;
-
-    if $(library-type) != INTERFACE
+    if $(library-type) = INTERFACE
     {
         print.text
 
+            ""
+            "add_library($(ltarget) INTERFACE IMPORTED)"
+            ""
+            "set_target_properties($(ltarget) PROPERTIES"
+            "  INTERFACE_INCLUDE_DIRECTORIES \"\${_BOOST_INCLUDEDIR}\""
+            "  INTERFACE_COMPILE_DEFINITIONS \"BOOST_ALL_NO_LIB\""
+            ")"
+            ""
+            "unset(_BOOST_INCLUDEDIR)"
+            "unset(_BOOST_CMAKEDIR)"
+            ""
+            : true ;
+    }
+    else
+    {
+        get-dir "_BOOST_LIBDIR" : $(libdir) ;
+
+        print.text
+
+            ""
             "include(${CMAKE_CURRENT_LIST_DIR}/../BoostDetectToolset-$(version).cmake)"
             ""
             "if(Boost_DEBUG)"
@@ -694,9 +733,7 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "  message(STATUS \"  Library has no variants and is considered not found\")"
             "endif()"
             ""
-            "get_target_property(__boost_configs $(ltarget) IMPORTED_CONFIGURATIONS)"
-            ""
-            "if(NOT __boost_configs)"
+            "if(NOT TARGET $(ltarget))"
             "  set(__boost_message \"No suitable build variant has been found.\")"
             "  if(__boost_skipped)"
             "    set(__boost_message \"${__boost_message}\\nThe following variants have been tried and rejected:\")"
@@ -708,14 +745,12 @@ rule generate-cmake-config- ( target : sources * : properties * )
             "  set($(name)_NOT_FOUND_MESSAGE ${__boost_message})"
             "  unset(__boost_message)"
             "  unset(__boost_skipped)"
-            "  unset(__boost_configs)"
             "  unset(__boost_variants)"
             "  unset(_BOOST_$(lname:U)_DEPS)"
             "  return()"
             "endif()"
             ""
             "unset(__boost_skipped)"
-            "unset(__boost_configs)"
             "unset(__boost_variants)"
             ""
             "if(_BOOST_$(lname:U)_DEPS)"
@@ -789,16 +824,6 @@ rule generate-cmake-config- ( target : sources * : properties * )
             ""
             : true ;
         }
-    }
-    else
-    {
-        print.text
-
-            "unset(_BOOST_LIBDIR)"
-            "unset(_BOOST_INCLUDEDIR)"
-            "unset(_BOOST_CMAKEDIR)"
-            ""
-            : true ;
     }
 
     print.text
