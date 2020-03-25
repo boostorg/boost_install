@@ -205,6 +205,7 @@ install:
   - ./bootstrap.sh
   - ./b2 headers
   - if [ -z "$STAGE" ]; then ./b2 -j3 --prefix=$HOME/.local --with-headers ${LAYOUT:+--layout=$LAYOUT} ${TOOLSET:+toolset=$TOOLSET} install; fi
+  - pip install --user cmake
 
 script:
   - |-
@@ -220,8 +221,6 @@ script:
   - if [ -z "$STAGE" ]; then export CMAKE_INSTALL="-DCMAKE_INSTALL_PREFIX=~/.local"; fi
   - cmake ${CMAKE_INSTALL} -DUSE_STAGED_BOOST=${STAGE-0} ${STAGEDIR:+-DBoost_ROOT=$TRAVIS_BUILD_DIR/../boost-root/$STAGEDIR} ${STAGELIBDIR:+-DBoost_ROOT=$TRAVIS_BUILD_DIR/../boost-root/$STAGELIBDIR/cmake} -DUSE_BOOST_PACKAGE=${UBP-0} -DUSE_ALL_COMPONENTS=${USE_ALL_COMPONENTS-0} ${USE_PYTHON_VERSION:+-DUSE_PYTHON_VERSION=$USE_PYTHON_VERSION} ${USE_PYTHON_COMPONENT:+-DUSE_PYTHON_COMPONENT=$USE_PYTHON_COMPONENT} ${BUILD_SHARED_LIBS:+-DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS} -DBoost_VERBOSE=ON ${Boost_USE_STATIC_LIBS:+-DBoost_USE_STATIC_LIBS=$Boost_USE_STATIC_LIBS} ${Boost_COMPILER:+-DBoost_COMPILER=$Boost_COMPILER} ${Boost_USE_MULTITHREADED:+-DBoost_USE_MULTITHREADED=$Boost_USE_MULTITHREADED} ..
   - cmake --build .
-  - export LD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$LD_LIBRARY_PATH
-  - export DYLD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$DYLD_LIBRARY_PATH
   - cmake --build . --target check
 
 notifications:
