@@ -85,6 +85,17 @@ environment:
     TOOLSET: msvc-14.1
   - LIB: random
     UBP: 1
+    B2_LINK: shared
+    USE_STATIC_LIBS: OFF
+    TOOLSET: msvc-14.1
+  - LIB: random
+    UBP: 1
+    BUILD_SHARED_LIBS: ON
+    TOOLSET: msvc-14.1
+  - LIB: random
+    UBP: 1
+    B2_LINK: shared
+    USE_STATIC_LIBS: OFF
     BUILD_SHARED_LIBS: ON
     TOOLSET: msvc-14.1
   - LIB: regex
