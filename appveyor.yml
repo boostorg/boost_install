@@ -80,6 +80,9 @@ environment:
   - LIB: serialization
     UBP: 1
     TOOLSET: msvc-14.1
+  - LIB: random
+    UBP: 1
+    TOOLSET: msvc-14.1
   - LIB: regex
     UBP: 1
     TOOLSET: msvc-14.1
