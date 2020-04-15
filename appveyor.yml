@@ -64,7 +64,7 @@ environment:
     TOOLSET: msvc-14.1
   - LIB: filesystem
     UBP: 1
-    PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
+    PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
     TOOLSET: gcc
     GENERATOR: MinGW Makefiles
   - LIB: headers
