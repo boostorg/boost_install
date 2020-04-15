@@ -18,7 +18,7 @@ environment:
   matrix:
   - LIB: filesystem
     UBP: 1
-    PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
+    PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
     TOOLSET: gcc
     GENERATOR: MinGW Makefiles
   - LIB: filesystem
@@ -153,6 +153,7 @@ test_script:
   - if NOT "%USE_STATIC_LIBS%" == "" SET USE_STATIC_LIBS=-DBoost_USE_STATIC_LIBS=%USE_STATIC_LIBS%
   - if NOT "%BUILD_SHARED_LIBS%" == "" SET BUILD_SHARED_LIBS=-DBUILD_SHARED_LIBS=%BUILD_SHARED_LIBS%
   - if NOT "%GENERATOR%" == "" SET GENERATOR=-G "%GENERATOR%"
+  - PATH %PATH:C:\Program Files\Git\usr\bin;=%
   - cmake %GENERATOR% -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON %USE_PYTHON_VERSION% %USE_STATIC_LIBS% %BUILD_SHARED_LIBS% %CMAKE_INSTALL% ..
   - PATH %PATH%;C:\projects\.local\lib;C:\projects\boost-root\stage\lib
   - cmake --build . --config Debug && cmake --build . --config Debug --target check
