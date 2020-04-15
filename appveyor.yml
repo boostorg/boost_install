@@ -17,10 +17,17 @@ image: Visual Studio 2017
 environment:
   matrix:
   - LIB: filesystem
-    UBP: 1
-    PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
-    TOOLSET: gcc
     GENERATOR: MinGW Makefiles
+    CMAKE_BUILD_TYPE: Debug
+    PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
+    UBP: 1
+    TOOLSET: gcc
+  - LIB: filesystem
+    GENERATOR: MinGW Makefiles
+    CMAKE_BUILD_TYPE: RelWithDebInfo
+    PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
+    UBP: 1
+    TOOLSET: gcc
   - LIB: filesystem
     TOOLSET: msvc-14.1
   - LIB: filesystem
@@ -153,10 +160,12 @@ test_script:
   - if NOT "%USE_STATIC_LIBS%" == "" SET USE_STATIC_LIBS=-DBoost_USE_STATIC_LIBS=%USE_STATIC_LIBS%
   - if NOT "%BUILD_SHARED_LIBS%" == "" SET BUILD_SHARED_LIBS=-DBUILD_SHARED_LIBS=%BUILD_SHARED_LIBS%
   - if NOT "%GENERATOR%" == "" SET GENERATOR=-G "%GENERATOR%"
+  - if NOT "%CMAKE_BUILD_TYPE%" == "" SET CMAKE_BUILD_TYPE=-DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%
   - PATH %PATH:C:\Program Files\Git\usr\bin;=%
-  - cmake %GENERATOR% -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON %USE_PYTHON_VERSION% %USE_STATIC_LIBS% %BUILD_SHARED_LIBS% %CMAKE_INSTALL% ..
+  - cmake %GENERATOR% -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON %USE_PYTHON_VERSION% %USE_STATIC_LIBS% %BUILD_SHARED_LIBS% %CMAKE_BUILD_TYPE% %CMAKE_INSTALL% ..
   - PATH %PATH%;C:\projects\.local\lib;C:\projects\boost-root\stage\lib
-  - cmake --build . --config Debug && cmake --build . --config Debug --target check
-  - cmake --build . --config Release && cmake --build . --config Release --target check
-  - cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
-  - cmake --build . --config RelWithDebInfo && cmake --build . --config RelWithDebInfo --target check
+  - if NOT "%CMAKE_BUILD_TYPE%" == "" cmake --build . && cmake --build . --target check
+  - if "%CMAKE_BUILD_TYPE%" == "" cmake --build . --config Debug && cmake --build . --config Debug --target check
+  - if "%CMAKE_BUILD_TYPE%" == "" cmake --build . --config Release && cmake --build . --config Release --target check
+  - if "%CMAKE_BUILD_TYPE%" == "" cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
+  - if "%CMAKE_BUILD_TYPE%" == "" cmake --build . --config RelWithDebInfo && cmake --build . --config RelWithDebInfo --target check
