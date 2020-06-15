@@ -1190,7 +1190,7 @@ rule boost-install ( libraries * )
     local p = [ project.current ] ;
 
     package.install install-libraries Boost
-        : # No requirements
+        : <install-no-version-symlinks>on
         : # No binaries
         : $(libraries)
         : # No headers
@@ -1201,7 +1201,7 @@ rule boost-install ( libraries * )
     install install-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%install-subdir ;
     $(p).mark-target-as-explicit install-unprefixed-static ;
 
-    install install-unprefixed-shared : $(unprefixed) : <install-type>SHARED_LIB <conditional>@boost-install%install-subdir ;
+    install install-unprefixed-shared : $(unprefixed) : <install-type>SHARED_LIB <install-no-version-symlinks>on <conditional>@boost-install%install-subdir ;
     $(p).mark-target-as-explicit install-unprefixed-shared ;
 
     install-cmake-config $(libraries) ;
@@ -1221,13 +1221,13 @@ rule boost-install ( libraries * )
     install stage-libraries-static : $(libraries) : <location>$(stage-libdir) <install-dependencies>on <install-type>STATIC_LIB ;
     $(p).mark-target-as-explicit stage-libraries-static ;
 
-    install stage-libraries-shared : $(libraries) : <location>$(stage-libdir) <install-dependencies>on <install-type>SHARED_LIB ;
+    install stage-libraries-shared : $(libraries) : <location>$(stage-libdir) <install-dependencies>on <install-type>SHARED_LIB <install-no-version-symlinks>on ;
     $(p).mark-target-as-explicit stage-libraries-shared ;
 
     install stage-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%stage-subdir ;
     $(p).mark-target-as-explicit stage-unprefixed-static ;
 
-    install stage-unprefixed-shared : $(unprefixed) : <install-type>SHARED_LIB <conditional>@boost-install%stage-subdir ;
+    install stage-unprefixed-shared : $(unprefixed) : <install-type>SHARED_LIB <install-no-version-symlinks>on <conditional>@boost-install%stage-subdir ;
     $(p).mark-target-as-explicit stage-unprefixed-shared ;
 
     generate stage-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>stage ;
