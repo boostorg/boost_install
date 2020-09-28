@@ -440,6 +440,22 @@ rule generate-cmake-variant- ( target : sources * : properties * )
             ""
             : true ;
     }
+
+    local deps2 = [ set.difference [ $(ps).get <boost-install.dependency> ] : boost_$(deps) ] ;
+    .info "  deps2=" $(deps2) ;
+
+    if $(deps2)
+    {
+        deps2 = "\"$<$<CONFIG:$(variant)>:$(deps2)>\"" ;
+
+        print.text
+
+            "set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES"
+            "  $(deps2:J= )"
+            "  )"
+            ""
+            : true ;
+    }
 }
 
 actions generate-cmake-variant-
