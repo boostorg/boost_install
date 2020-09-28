@@ -444,6 +444,8 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     local deps2 = [ set.difference [ $(ps).get <boost-install.dependency> ] : boost_$(deps) ] ;
     .info "  deps2=" $(deps2) ;
 
+    deps2 = [ set.difference $(deps2) : python.lib ] ;
+
     if $(deps2)
     {
         deps2 = "\"$<$<CONFIG:$(variant)>:$(deps2)>\"" ;
