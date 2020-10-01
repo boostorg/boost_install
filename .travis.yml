@@ -158,6 +158,8 @@ matrix:
 
     - env: LIB=regex
     - env: LIB=regex UBP=1
+    - env: LIB=regex UBP=1 Boost_USE_STATIC_LIBS=ON
+
     - env: LIB=serialization
     - env: LIB=serialization UBP=1
     - env: LIB=system
