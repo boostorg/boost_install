@@ -121,12 +121,16 @@ matrix:
     - env: LIB=chrono UBP=1
     - env: LIB=container
     - env: LIB=container UBP=1
+
     - env: LIB=iostreams
     - env: LIB=iostreams UBP=1
+    - env: LIB=iostreams UBP=1 Boost_USE_STATIC_LIBS=ON
     - env: LIB=iostreams STAGE=1
     - env: LIB=iostreams UBP=1 STAGE=1
+
     - env: LIB=log
     - env: LIB=log UBP=1
+    - env: LIB=log UBP=1 Boost_USE_STATIC_LIBS=ON
     - env: LIB=log USE_ALL_COMPONENTS=1
     - env: LIB=log LAYOUT=tagged-1.66 THREADING=multi,single
 
