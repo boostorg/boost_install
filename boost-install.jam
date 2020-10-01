@@ -54,6 +54,36 @@ local rule .debug ( messages * )
 
 # generate-cmake-variant-
 
+local rule remap-library ( lib )
+{
+    switch $(lib)
+    {
+    case "python.lib" :
+
+        return ;
+
+    case "zlib" :
+
+        return "z" ;
+
+    case "bzip2" :
+
+        return "bz2" ;
+
+    case "icudt" :
+
+        return "icudata" ;
+
+    case "icuin" :
+
+        return "icui18n" ;
+
+    case * :
+
+        return $(lib) ;
+    }
+}
+
 rule generate-cmake-variant- ( target : sources * : properties * )
 {
     .info generate-cmake-variant- $(target) ":" $(sources) ;
@@ -444,17 +474,26 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     local deps2 = [ set.difference [ $(ps).get <boost-install.dependency> ] : boost_$(deps) ] ;
     .info "  deps2=" $(deps2) ;
 
-    deps2 = [ set.difference $(deps2) : python.lib ] ;
+    local deps3 ;
 
-    if $(deps2)
+    for local dep in $(deps2)
     {
-        deps2 = "\"$<$<CONFIG:$(variant)>:$(deps2)>\"" ;
+        deps3 += [ remap-library $(dep) ] ;
+    }
 
+    .info "  deps3=" $(deps3) ;
+
+    if $(deps3)
+    {
         print.text
 
-            "set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES"
-            "  $(deps2:J= )"
-            "  )"
+            "if(CMAKE_CONFIGURATION_TYPES)"
+            "  set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES"
+            "    \"$<$<CONFIG:$(variant)>:$(deps3:J=;)>\")"
+            "else()"
+            "  set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES"
+            "    $(deps3:J= ))"
+            "endif()"
             ""
             : true ;
     }
