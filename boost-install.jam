@@ -1246,14 +1246,21 @@ rule boost-install ( libraries * )
 
     local p = [ project.current ] ;
 
-    package.install install-libraries Boost
-        : <install-no-version-symlinks>on
-        : # No binaries
-        : $(libraries)
-        : # No headers
-    ;
+    local libdir = [ boost-install-dirs.libdir ] ;
+    local bindir = [ boost-install-dirs.bindir ] ;
 
-    $(p).mark-target-as-explicit install-libraries ;
+    install install-libraries-static : $(libraries) : <location>$(libdir) <install-dependencies>on <install-type>STATIC_LIB ;
+    $(p).mark-target-as-explicit install-libraries-static ;
+
+    alias install-libraries-shared : install-libraries-shared- ;
+    alias install-libraries-shared : install-libraries-shared-cygwin : <target-os>cygwin ;
+    $(p).mark-target-as-explicit install-libraries-shared ;
+
+    install install-libraries-shared- : $(libraries) : <location>$(libdir) <install-type>SHARED_LIB <install-type>PDB <install-dependencies>on <install-no-version-symlinks>on ;
+    $(p).mark-target-as-explicit install-libraries-shared- ;
+
+    install install-libraries-shared-cygwin : $(libraries) : <location>$(bindir) <install-type>SHARED_LIB <install-type>PDB <install-dependencies>on <install-no-version-symlinks>on ;
+    $(p).mark-target-as-explicit install-unprefixed-shared-cygwin ;
 
     install install-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%install-subdir ;
     $(p).mark-target-as-explicit install-unprefixed-static ;
@@ -1266,7 +1273,7 @@ rule boost-install ( libraries * )
     generate install-dependencies : $(libraries) : <generating-rule>@boost-install%generate-dependencies <name>install ;
     $(p).mark-target-as-explicit install-dependencies ;
 
-    alias install : install-libraries install-unprefixed-static install-unprefixed-shared install-cmake-config install-dependencies ;
+    alias install : install-libraries-static install-libraries-shared install-unprefixed-static install-unprefixed-shared install-cmake-config install-dependencies ;
     $(p).mark-target-as-explicit install ;
 
     # Target stage
