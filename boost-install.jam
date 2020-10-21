@@ -1260,7 +1260,7 @@ rule boost-install ( libraries * )
     $(p).mark-target-as-explicit install-libraries-shared- ;
 
     install install-libraries-shared-cygwin : $(libraries) : <location>$(bindir) <install-type>SHARED_LIB <install-type>PDB <install-dependencies>on <install-no-version-symlinks>on ;
-    $(p).mark-target-as-explicit install-unprefixed-shared-cygwin ;
+    $(p).mark-target-as-explicit install-libraries-shared-cygwin ;
 
     install install-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%install-subdir ;
     $(p).mark-target-as-explicit install-unprefixed-static ;
