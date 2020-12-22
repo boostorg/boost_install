@@ -364,12 +364,136 @@ jobs:
       fail-fast: false
       matrix:
         include:
+
+          # install
+
           - lib: filesystem
             bopts: install
             os: windows-2019
+
+          - lib: filesystem
+            bopts: --layout=tagged install
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: link=shared install
+            copts: -DBoost_USE_STATIC_LIBS=OFF
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: link=static,shared install
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: link=static,shared install
+            copts: -DBoost_USE_STATIC_LIBS=OFF
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: link=static,shared install
+            copts: -DBoost_USE_STATIC_LIBS=ON
+            os: windows-2019
+
+          # stage
+
+          - lib: filesystem
+            bopts: stage
+            copts: -DUSE_STAGED_BOOST=ON
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: link=shared stage
+            copts: -DUSE_STAGED_BOOST=ON -DBoost_USE_STATIC_LIBS=OFF
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: link=static,shared stage
+            copts: -DUSE_STAGED_BOOST=ON
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: link=static,shared stage
+            copts: -DUSE_STAGED_BOOST=ON -DBoost_USE_STATIC_LIBS=OFF
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: link=static,shared stage
+            copts: -DUSE_STAGED_BOOST=ON -DBoost_USE_STATIC_LIBS=ON
+            os: windows-2019
+
+          # mingw
+
           - lib: filesystem
             bopts: toolset=gcc install
             copts: "-G \"MinGW Makefiles\" -DCMAKE_BUILD_TYPE=Debug"
+            os: windows-2019
+
+          - lib: filesystem
+            bopts: toolset=gcc install
+            copts: "-G \"MinGW Makefiles\" -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+            os: windows-2019
+
+          # other libraries
+
+          - lib: headers
+            bopts: install
+            os: windows-2019
+
+          - lib: iostreams
+            bopts: install
+            os: windows-2019
+
+          - lib: iostreams
+            bopts: stage
+            copts: -DUSE_STAGED_BOOST=ON
+            os: windows-2019
+
+          - lib: log
+            bopts: install
+            os: windows-2019
+
+          - lib: log
+            bopts: link=shared install
+            copts: -DBoost_USE_STATIC_LIBS=OFF
+            os: windows-2019
+
+          - lib: python
+            bopts: install
+            os: windows-2019
+
+          - lib: serialization
+            bopts: install
+            os: windows-2019
+
+          - lib: random
+            bopts: install
+            os: windows-2019
+
+          - lib: random
+            bopts: link=shared install
+            copts: -DBoost_USE_STATIC_LIBS=OFF
+            os: windows-2019
+
+          - lib: random
+            bopts: install
+            copts: -DBUILD_SHARED_LIBS=ON
+            os: windows-2019
+
+          - lib: random
+            bopts: link=shared install
+            copts: -DBUILD_SHARED_LIBS=ON -DBoost_USE_STATIC_LIBS=OFF
+            os: windows-2019
+
+          - lib: regex
+            bopts: install
+            os: windows-2019
+
+          - lib: test
+            bopts: install
+            os: windows-2019
+
+          - lib: thread
+            bopts: install
             os: windows-2019
 
     runs-on: ${{matrix.os}}
