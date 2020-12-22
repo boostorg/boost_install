@@ -459,6 +459,7 @@ jobs:
 
           - lib: python
             bopts: install
+            copts: -DUSE_PYTHON_VERSION=3.7
             os: windows-2019
 
           - lib: serialization
