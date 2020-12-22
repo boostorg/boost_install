@@ -299,15 +299,14 @@ jobs:
           cd ../boost-root
           echo "using python : 2.7 ;" >> ~/user-config.jam
           echo "using python : 3.5 ;" >> ~/user-config.jam
-          # echo "using mpi ;" >> ~/user-config.jam
+          echo "using mpi ;" >> ~/user-config.jam
           ./b2 -d0 -j3 --prefix=$HOME/.local --with-headers ${{matrix.bopts}}
           ./b2 -j3 --prefix=$HOME/.local --with-${{matrix.lib}} ${{matrix.bopts}}
           cd tools/boost_install/test/${{matrix.lib}}
           mkdir __build__ && cd __build__
           cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ${{matrix.copts}} ..
           VERBOSE=1 cmake --build .
-          # export LD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$LD_LIBRARY_PATH
-          # export DYLD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$DYLD_LIBRARY_PATH
+          export LD_LIBRARY_PATH=$HOME/.local/lib:$GITHUB_WORKSPACE/../boost-root/stage/lib:$LD_LIBRARY_PATH
           cmake --build . --target check
 
   windows:
