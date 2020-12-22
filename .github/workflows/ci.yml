@@ -50,6 +50,7 @@ jobs:
           echo "using python : 2.7 ;" >> ~/user-config.jam
           echo "using python : 3.5 ;" >> ~/user-config.jam
           # echo "using mpi ;" >> ~/user-config.jam
+          ./b2 -d0 -j3 --prefix=$HOME/.local --with-headers ${{matrix.bopts}}
           ./b2 -j3 --prefix=$HOME/.local --with-${{matrix.lib}} ${{matrix.bopts}}
           cd tools/boost_install/test/${{matrix.lib}}
           mkdir __build__ && cd __build__
@@ -99,6 +100,7 @@ jobs:
           cd ../boost-root
           set ZLIB_SOURCE=%CD%\tools\boost_install\test\iostreams\zlib-1.2.11
           set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.8
+          b2 -d0 -j3 --prefix=%GITHUB_WORKSPACE%\..\.local --with-headers ${{matrix.bopts}}
           b2 -j3 --prefix=%GITHUB_WORKSPACE%\..\.local --with-${{matrix.lib}} ${{matrix.bopts}}
           cd tools\boost_install\test\%LIB%
           mkdir __build__ && cd __build__
