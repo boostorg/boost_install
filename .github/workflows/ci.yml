@@ -224,6 +224,7 @@ jobs:
           - lib: mpi
             bopts: install
             os: ubuntu-20.04
+            install: libopenmpi-dev
 
           - lib: program_options
             bopts: install
@@ -232,6 +233,7 @@ jobs:
           - lib: python
             bopts: install
             os: ubuntu-20.04
+            install: libpython2-dev libpython3-dev
 
           - lib: random
             bopts: install
@@ -298,7 +300,7 @@ jobs:
         run: |
           cd ../boost-root
           echo "using python : 2.7 ;" >> ~/user-config.jam
-          echo "using python : 3.5 ;" >> ~/user-config.jam
+          echo "using python : 3.8 ;" >> ~/user-config.jam
           echo "using mpi ;" >> ~/user-config.jam
           ./b2 -d0 -j3 --prefix=$HOME/.local --with-headers ${{matrix.bopts}}
           ./b2 -j3 --prefix=$HOME/.local --with-${{matrix.lib}} ${{matrix.bopts}}
