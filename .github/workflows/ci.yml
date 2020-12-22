@@ -102,7 +102,7 @@ jobs:
           set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.8
           b2 -d0 -j3 --prefix=%GITHUB_WORKSPACE%\..\.local --with-headers ${{matrix.bopts}}
           b2 -j3 --prefix=%GITHUB_WORKSPACE%\..\.local --with-${{matrix.lib}} ${{matrix.bopts}}
-          cd tools\boost_install\test\%LIB%
+          cd tools\boost_install\test\${{matrix.lib}}
           mkdir __build__ && cd __build__
           cmake -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\..\.local -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ${{matrix.copts}} ..
           cmake --build . --config Debug && cmake --build . --config Debug --target check
