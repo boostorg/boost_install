@@ -136,22 +136,27 @@ jobs:
 
           - lib: filesystem
             bopts: stage
+            copts: -DUSE_STAGED_BOOST=ON
             os: ubuntu-20.04
 
           - lib: filesystem
             bopts: stage
+            copts: -DUSE_STAGED_BOOST=ON
             os: macos-10.15
 
           - lib: filesystem
             bopts: --stagedir=stage64-gcc5 stage
+            copts: -DBoost_ROOT=$GITHUB_WORKSPACE/../boost-root/stage64-gcc5
             os: ubuntu-20.04
 
           - lib: filesystem
             bopts: --stagedir=. stage
+            copts: -DBoost_ROOT=$GITHUB_WORKSPACE/../boost-root/.
             os: ubuntu-20.04
 
           - lib: filesystem
             bopts: --stage-libdir=lib64-gcc5 stage
+            copts: -DBoost_ROOT=$GITHUB_WORKSPACE/../boost-root/lib64-gcc5/cmake
             os: ubuntu-20.04
 
           # Boost_INCLUDE_DIRS, old style
@@ -185,11 +190,12 @@ jobs:
 
           - lib: iostreams
             bopts: stage
+            copts: -DUSE_STAGED_BOOST=ON
             os: ubuntu-20.04
 
           - lib: iostreams
             bopts: stage
-            copts: -DBoost_USE_STATIC_LIBS=ON
+            copts: -DUSE_STAGED_BOOST=ON -DBoost_USE_STATIC_LIBS=ON
             os: ubuntu-20.04
 
           - lib: log
@@ -203,11 +209,12 @@ jobs:
 
           - lib: log
             bopts: stage
+            copts: -DUSE_STAGED_BOOST=ON
             os: ubuntu-20.04
 
           - lib: log
             bopts: stage
-            copts: -DBoost_USE_STATIC_LIBS=ON
+            copts: -DUSE_STAGED_BOOST=ON -DBoost_USE_STATIC_LIBS=ON
             os: ubuntu-20.04
 
           - lib: log
