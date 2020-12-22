@@ -224,14 +224,14 @@ jobs:
           - lib: mpi
             bopts: install
             os: ubuntu-20.04
-            install: libopenmpi-dev
+            install: libopenmpi-dev libpython2-dev
 
           - lib: program_options
             bopts: install
             os: ubuntu-20.04
 
           - lib: python
-            bopts: install
+            bopts: python=2.7,3.8 install
             os: ubuntu-20.04
             install: libpython2-dev libpython3-dev
 
