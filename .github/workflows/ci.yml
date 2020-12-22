@@ -69,7 +69,7 @@ jobs:
             bopts: install
             os: windows-2019
           - lib: filesystem
-            bopts: install
+            bopts: toolset=gcc install
             copts: "-G \"MinGW Makefiles\" -DCMAKE_BUILD_TYPE=Debug"
             os: windows-2019
 
