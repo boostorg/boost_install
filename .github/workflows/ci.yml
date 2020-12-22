@@ -14,12 +14,255 @@ jobs:
       fail-fast: false
       matrix:
         include:
+
           - lib: filesystem
             bopts: install
             os: ubuntu-20.04
+
           - lib: filesystem
             bopts: install
             os: macos-10.15
+
+          # --layout=versioned
+
+          - lib: filesystem
+            bopts: --layout=versioned install
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: --layout=versioned install
+            os: macos-10.15
+
+          # --layout=tagged
+
+          - lib: filesystem
+            bopts: --layout=tagged install
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: --layout=tagged install
+            os: macos-10.15
+
+          # build with clang++, use with g++
+
+          - lib: filesystem
+            bopts: toolset=clang install
+            os: ubuntu-20.04
+
+          # same, with tagged layout
+
+          - lib: filesystem
+            bopts: toolset=clang --layout=tagged install
+            os: ubuntu-20.04
+
+          # build with both gcc and clang, use with gcc
+
+          - lib: filesystem
+            bopts: toolset=gcc,clang --layout=versioned install
+            os: ubuntu-20.04
+
+          # build with clang, use with gcc (w/ toolset override)
+
+          - lib: filesystem
+            bopts: toolset=clang --layout=versioned install
+            copts: -DBoost_COMPILER=clang9
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: toolset=clang --layout=versioned install
+            copts: -DBoost_COMPILER=-clang9
+            os: ubuntu-20.04
+
+          # shared
+
+          - lib: filesystem
+            bopts: install
+            copts: -DBoost_USE_STATIC_LIBS=OFF
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: link=shared install
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: link=shared install
+            copts: -DBoost_USE_STATIC_LIBS=OFF
+            os: ubuntu-20.04
+
+          # static
+
+          - lib: filesystem
+            bopts: install
+            copts: -DBoost_USE_STATIC_LIBS=ON
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: link=static install
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: link=static install
+            copts: -DBoost_USE_STATIC_LIBS=ON
+            os: ubuntu-20.04
+
+          # threading=multi,single
+
+          - lib: filesystem
+            bopts: --layout=tagged-1.66 threading=multi,single install
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: --layout=tagged-1.66 threading=multi,single install
+            copts: -DBoost_USE_MULTITHREADED=ON
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: --layout=tagged-1.66 threading=multi,single install
+            copts: -DBoost_USE_MULTITHREADED=OFF
+            os: ubuntu-20.04
+
+          # threading=single
+
+          - lib: filesystem
+            bopts: threading=single install
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: threading=single install
+            copts: -DBoost_USE_MULTITHREADED=OFF
+            os: ubuntu-20.04
+
+          # staged
+
+          - lib: filesystem
+            bopts: stage
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: stage
+            os: macos-10.15
+
+          - lib: filesystem
+            bopts: --stagedir=stage64-gcc5 stage
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: --stagedir=. stage
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: --stage-libdir=lib64-gcc5 stage
+            os: ubuntu-20.04
+
+          # Boost_INCLUDE_DIRS, old style
+
+          - lib: headers
+            bopts: install
+            os: ubuntu-20.04
+
+          # other libraries
+
+          - lib: atomic
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: chrono
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: container
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: iostreams
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: iostreams
+            bopts: install
+            copts: -DBoost_USE_STATIC_LIBS=ON
+            os: ubuntu-20.04
+
+          - lib: iostreams
+            bopts: stage
+            os: ubuntu-20.04
+
+          - lib: iostreams
+            bopts: stage
+            copts: -DBoost_USE_STATIC_LIBS=ON
+            os: ubuntu-20.04
+
+          - lib: log
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: log
+            bopts: install
+            copts: -DBoost_USE_STATIC_LIBS=ON
+            os: ubuntu-20.04
+
+          - lib: log
+            bopts: stage
+            os: ubuntu-20.04
+
+          - lib: log
+            bopts: stage
+            copts: -DBoost_USE_STATIC_LIBS=ON
+            os: ubuntu-20.04
+
+          - lib: log
+            bopts: --layout=tagged-1.66 threading=multi,single install
+            os: ubuntu-20.04
+
+          - lib: mpi
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: program_options
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: python
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: random
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: random
+            bopts: install
+            copts: -DBUILD_SHARED_LIBS=ON
+            os: ubuntu-20.04
+
+          - lib: regex
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: regex
+            bopts: install
+            copts: -DBoost_USE_STATIC_LIBS=ON
+            os: ubuntu-20.04
+
+          - lib: serialization
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: system
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: test
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: thread
+            bopts: install
+            os: ubuntu-20.04
+
+          - lib: wave
+            bopts: install
+            os: ubuntu-20.04
 
     runs-on: ${{matrix.os}}
 
