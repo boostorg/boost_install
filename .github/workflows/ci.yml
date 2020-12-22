@@ -231,7 +231,48 @@ jobs:
             os: ubuntu-20.04
 
           - lib: python
+            bopts: install
+            os: ubuntu-20.04
+            install: libpython2-dev
+
+          - lib: python
             bopts: python=2.7,3.8 install
+            os: ubuntu-20.04
+            install: libpython2-dev libpython3-dev
+
+          - lib: python
+            bopts: python=2.7,3.8 install
+            copts: -DUSE_PYTHON_VERSION=2.7
+            os: ubuntu-20.04
+            install: libpython2-dev libpython3-dev
+
+          - lib: python
+            bopts: python=2.7,3.8 install
+            copts: -DUSE_PYTHON_VERSION=3.8
+            os: ubuntu-20.04
+            install: libpython2-dev libpython3-dev
+
+          - lib: python
+            bopts: python=2.7,3.8 install
+            copts: -DUSE_PYTHON_VERSION=2.7 -DUSE_PYTHON_COMPONENT=python27
+            os: ubuntu-20.04
+            install: libpython2-dev libpython3-dev
+
+          - lib: python
+            bopts: python=2.7,3.8 install
+            copts: -DUSE_PYTHON_VERSION=3.8 -DUSE_PYTHON_COMPONENT=python38
+            os: ubuntu-20.04
+            install: libpython2-dev libpython3-dev
+
+          - lib: python
+            bopts: python=2.7,3.8 install
+            copts: -DUSE_PYTHON_VERSION=2.7 -DUSE_PYTHON_COMPONENT=python2
+            os: ubuntu-20.04
+            install: libpython2-dev libpython3-dev
+
+          - lib: python
+            bopts: python=2.7,3.8 install
+            copts: -DUSE_PYTHON_VERSION=3.8 -DUSE_PYTHON_COMPONENT=python3
             os: ubuntu-20.04
             install: libpython2-dev libpython3-dev
 
