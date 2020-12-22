@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+      - feature/**
+
+jobs:
+  posix:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lib: filesystem
+            bopts: install
+            os: ubuntu-20.04
+          - lib: filesystem
+            bopts: install
+            os: macos-10.15
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install packages
+        if: matrix.install
+        run: sudo apt install ${{matrix.install}}
+
+      - name: Setup Boost
+        run: |
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          cd ..
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/${{matrix.lib}}
+          python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" ${{matrix.lib}}
+          rm -rf tools/boost_install/*
+          cp -r $GITHUB_WORKSPACE/* tools/boost_install
+          ./bootstrap.sh
+          ./b2 -d0 headers
+
+      - name: Run tests
+        run: |
+          cd ../boost-root
+          echo "using python : 2.7 ;" >> ~/user-config.jam
+          echo "using python : 3.5 ;" >> ~/user-config.jam
+          # echo "using mpi ;" >> ~/user-config.jam
+          ./b2 -j3 --prefix=$HOME/.local --with-${{matrix.lib}} ${{matrix.bopts}}
+          cd tools/boost_install/test/${{matrix.lib}}
+          mkdir __build__ && cd __build__
+          cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ${{matrix.copts}} ..
+          VERBOSE=1 cmake --build .
+          # export LD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$LD_LIBRARY_PATH
+          # export DYLD_LIBRARY_PATH=$HOME/.local/lib:$TRAVIS_BUILD_DIR/../boost-root/stage/lib:$DYLD_LIBRARY_PATH
+          cmake --build . --target check
+
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lib: filesystem
+            bopts: install
+            os: windows-2019
+          - lib: filesystem
+            bopts: install
+            copts: "-G \"MinGW Makefiles\" -DCMAKE_BUILD_TYPE=Debug"
+            os: windows-2019
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Boost
+        shell: cmd
+        run: |
+          if "%GITHUB_BASE_REF%" == "" set GITHUB_BASE_REF=%GITHUB_REF%
+          set BOOST_BRANCH=develop
+          if "%GITHUB_BASE_REF%" == "master" set BOOST_BRANCH=master
+          cd ..
+          git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/${{matrix.lib}}
+          python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" ${{matrix.lib}}
+          rd /s/q tools\boost_install
+          xcopy /s /e /q %GITHUB_WORKSPACE% tools\boost_install\
+          cmd /c bootstrap
+          b2 -d0 headers
+
+      - name: Run tests
+        shell: cmd
+        run: |
+          cd ../boost-root
+          set ZLIB_SOURCE=%CD%\tools\boost_install\test\iostreams\zlib-1.2.11
+          set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.8
+          b2 -j3 --prefix=%GITHUB_WORKSPACE%\..\.local --with-${{matrix.lib}} ${{matrix.bopts}}
+          cd tools\boost_install\test\%LIB%
+          mkdir __build__ && cd __build__
+          cmake -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\..\.local -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ${{matrix.copts}} ..
+          cmake --build . --config Debug && cmake --build . --config Debug --target check
+          cmake --build . --config Release && cmake --build . --config Release --target check
+          cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
+          cmake --build . --config RelWithDebInfo && cmake --build . --config RelWithDebInfo --target check
