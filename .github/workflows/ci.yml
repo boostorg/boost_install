@@ -458,8 +458,8 @@ jobs:
             os: windows-2019
 
           - lib: python
-            bopts: install
-            copts: -DUSE_PYTHON_VERSION=3.7
+            bopts: python=3.9 install
+            #copts: -DUSE_PYTHON_VERSION=3.7
             os: windows-2019
 
           - lib: serialization
