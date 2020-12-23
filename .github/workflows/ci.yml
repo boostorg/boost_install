@@ -516,6 +516,10 @@ jobs:
           rd /s/q tools\boost_install
           xcopy /s /e /q %GITHUB_WORKSPACE% tools\boost_install\
           cmd /c bootstrap
+          set USER_CONFIG=%HOMEDRIVE%%HOMEPATH%\user-config.jam
+          echo using python : 2.7 ; >> %USER_CONFIG%
+          echo using python : 3.7 ; >> %USER_CONFIG%
+          echo using python : 3.9 ; >> %USER_CONFIG%
           b2 -d0 headers
 
       - name: Run tests
