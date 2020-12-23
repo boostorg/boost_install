@@ -458,11 +458,6 @@ jobs:
             os: windows-2019
 
           - lib: python
-            bopts: install
-            copts: "-DUSE_PYTHON_VERSION=\"3.7;EXACT\""
-            os: windows-2019
-
-          - lib: python
             bopts: python=2.7,3.7,3.9 install
             copts: "-DUSE_PYTHON_VERSION=\"3.7;EXACT\""
             os: windows-2019
