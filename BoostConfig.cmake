@@ -235,6 +235,10 @@ set(Boost_VERSION_MACRO ${Boost_VERSION_MAJOR}0${Boost_VERSION_MINOR}0${Boost_VE
 get_target_property(Boost_INCLUDE_DIRS Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
 set(Boost_LIBRARIES "")
 
+# Save project's policies
+cmake_policy(PUSH)
+cmake_policy(SET CMP0057 NEW) # if IN_LIST
+
 # Find components
 
 if("ALL" IN_LIST Boost_FIND_COMPONENTS)
@@ -280,3 +284,6 @@ endif()
 if("ALL" IN_LIST Boost_FIND_COMPONENTS)
   set(Boost_ALL_FOUND ${boost_headers_FOUND})
 endif()
+
+# Restore project's policies
+cmake_policy(POP)
