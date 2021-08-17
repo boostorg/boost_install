@@ -172,6 +172,11 @@ jobs:
             bopts: install
             os: ubuntu-20.04
 
+          - lib: headers
+            bopts: stage
+            copts: -DUSE_STAGED_BOOST=ON
+            os: ubuntu-20.04
+
           # other libraries
 
           - lib: atomic
