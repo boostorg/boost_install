@@ -65,12 +65,12 @@ jobs:
 
           - lib: filesystem
             bopts: toolset=clang --layout=versioned install
-            copts: -DBoost_COMPILER=clang10
+            copts: -DBoost_COMPILER=clang11
             os: ubuntu-20.04
 
           - lib: filesystem
             bopts: toolset=clang --layout=versioned install
-            copts: -DBoost_COMPILER=-clang10
+            copts: -DBoost_COMPILER=-clang11
             os: ubuntu-20.04
 
           # shared
