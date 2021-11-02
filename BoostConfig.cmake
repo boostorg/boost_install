@@ -272,10 +272,16 @@ if(NOT TARGET Boost::boost)
   add_library(Boost::boost INTERFACE IMPORTED)
   set_property(TARGET Boost::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::headers)
 
-  # All Boost:: targets already disable autolink
-  add_library(Boost::diagnostic_definitions INTERFACE IMPORTED)
   add_library(Boost::disable_autolinking INTERFACE IMPORTED)
+  add_library(Boost::diagnostic_definitions INTERFACE IMPORTED)
   add_library(Boost::dynamic_linking INTERFACE IMPORTED)
+
+  if(WIN32)
+
+    set_property(TARGET Boost::disable_autolinking PROPERTY INTERFACE_COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB")
+    set_property(TARGET Boost::diagnostic_definitions PROPERTY INTERFACE_COMPILE_DEFINITIONS "BOOST_LIB_DIAGNOSTIC")
+
+  endif()
 
 endif()
 
