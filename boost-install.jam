@@ -401,9 +401,26 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         "    INTERFACE_INCLUDE_DIRECTORIES \"\${_BOOST_INCLUDEDIR}\""
         "    INTERFACE_COMPILE_DEFINITIONS \"BOOST_$(lname:U)_NO_LIB\""
         "  )"
-        "endif()"
         ""
         : true ;
+
+    if $(link) = shared
+    {
+        local dllname = "$(fname:B).dll" ;
+        .info "  dllname=" $(dllname) ;
+
+        print.text
+
+        "  if(WIN32)"
+        "    set_target_properties($(target) PROPERTIES"
+        "      IMPORTED_LOCATION \"${_BOOST_LIBDIR}/$(dllname)\""
+        "    )"
+        "  endif()"
+        ""
+        : true ;
+    }
+
+    print.text "endif()" "" : true ;
 
     print.text "# Target file name: $(fname)" "" : true ;
 
