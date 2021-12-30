@@ -406,7 +406,11 @@ rule generate-cmake-variant- ( target : sources * : properties * )
 
     if $(link) = shared
     {
-        local dllname = "$(fname:B).dll" ;
+        local prefix = [ type.generated-target-prefix SHARED_LIB : $(ps) ] ;
+        .info "  prefix=" $(prefix) ;
+        local suffix = [ type.generated-target-suffix SHARED_LIB : $(ps) ] ;
+        .info "  suffix=" $(suffix) ;
+        local dllname = [ sequence.join $(prefix) $(fname:BS=) "." $(suffix) ] ;
         .info "  dllname=" $(dllname) ;
 
         print.text
