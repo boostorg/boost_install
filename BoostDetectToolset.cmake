@@ -28,7 +28,7 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
 
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
-  if(MSVC)
+  if(MSVC_VERSION)
     set(BOOST_DETECTED_TOOLSET "clangw")
   else()
     set(BOOST_DETECTED_TOOLSET "clang")
