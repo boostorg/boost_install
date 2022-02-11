@@ -443,6 +443,20 @@ jobs:
             copts: "-G \"MinGW Makefiles\" -DCMAKE_BUILD_TYPE=RelWithDebInfo"
             os: windows-2019
 
+          # msvc-14.3
+
+          - lib: filesystem
+            bopts: install
+            os: windows-2022
+
+          # clang-cl
+          #   b2 finds clang-13, but CMake uses the one supplied with VS2022, which is 12
+
+          - lib: filesystem
+            bopts: toolset=clang-win install
+            copts: "-G \"Visual Studio 17 2022\" -T clangcl -DBoost_COMPILER=clangw13"
+            os: windows-2022
+
           # other libraries
 
           - lib: headers
@@ -538,6 +552,7 @@ jobs:
       - name: Run tests
         shell: cmd
         run: |
+          echo on
           cd ../boost-root
           set ZLIB_SOURCE=%CD%\tools\boost_install\test\iostreams\zlib-1.2.11
           set BZIP2_SOURCE=%CD%\tools\boost_install\test\iostreams\bzip2-1.0.8
