@@ -21,7 +21,7 @@ jobs:
 
           - lib: filesystem
             bopts: install
-            os: macos-10.15
+            os: macos-latest
 
           # --layout=versioned
 
@@ -31,7 +31,7 @@ jobs:
 
           - lib: filesystem
             bopts: --layout=versioned install
-            os: macos-10.15
+            os: macos-latest
 
           # --layout=tagged
 
@@ -41,7 +41,7 @@ jobs:
 
           - lib: filesystem
             bopts: --layout=tagged install
-            os: macos-10.15
+            os: macos-latest
 
           # build with clang++, use with g++
 
@@ -142,7 +142,7 @@ jobs:
           - lib: filesystem
             bopts: stage
             copts: -DUSE_STAGED_BOOST=ON
-            os: macos-10.15
+            os: macos-latest
 
           - lib: filesystem
             bopts: --stagedir=stage64-gcc5 stage
