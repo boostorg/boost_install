@@ -450,11 +450,11 @@ jobs:
             os: windows-2022
 
           # clang-cl
-          #   b2 finds clang-13, but CMake uses the one supplied with VS2022, which is 12
+          #   b2 and CMake find and use a different clang-cl
 
           - lib: filesystem
             bopts: toolset=clang-win install
-            copts: "-G \"Visual Studio 17 2022\" -T clangcl -DBoost_COMPILER=clangw13"
+            copts: "-G \"Visual Studio 17 2022\" -T clangcl -DBoost_COMPILER=clangw14"
             os: windows-2022
 
           # other libraries
