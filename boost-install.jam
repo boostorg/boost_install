@@ -202,7 +202,7 @@ rule generate-cmake-variant- ( target : sources * : properties * )
         print.text
 
             "if(Boost_COMPILER)"
-            "  if(NOT Boost_COMPILER STREQUAL \"$(toolset)\" AND NOT Boost_COMPILER STREQUAL \"-$(toolset)\")"
+            "  if(NOT \"$(toolset)\" IN_LIST Boost_COMPILER AND NOT \"-$(toolset)\" IN_LIST Boost_COMPILER)"
             "    _BOOST_SKIPPED(\"$(fname)\" \"$(toolset), Boost_COMPILER=${Boost_COMPILER}\")"
             "    return()"
             "  endif()"
