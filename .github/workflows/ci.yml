@@ -73,6 +73,28 @@ jobs:
             copts: -DBoost_COMPILER=-clang11
             os: ubuntu-20.04
 
+          # build with gcc/clang, use with clang/gcc (w/ toolset list)
+
+          - lib: filesystem
+            bopts: toolset=gcc --layout=versioned install
+            copts: -DCMAKE_CXX_COMPILER=clang++ -DBoost_COMPILER="gcc9;clang11"
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: toolset=clang --layout=versioned install
+            copts: -DBoost_COMPILER="gcc9;clang11"
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: toolset=gcc --layout=versioned install
+            copts: -DCMAKE_CXX_COMPILER=clang++ -DBoost_COMPILER="-gcc9;-clang11"
+            os: ubuntu-20.04
+
+          - lib: filesystem
+            bopts: toolset=clang --layout=versioned install
+            copts: -DBoost_COMPILER="-gcc9;-clang11"
+            os: ubuntu-20.04
+
           # shared
 
           - lib: filesystem
