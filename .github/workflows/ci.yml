@@ -366,9 +366,11 @@ jobs:
           REF=${REF#refs/heads/}
           echo REF: $REF
           BOOST_BRANCH=develop && ( test "${GITHUB_REF_NAME}" == "master" || test "${GITHUB_REF_NAME}" == "modular" ) && BOOST_BRANCH=${GITHUB_REF_NAME} || true
-          echo BOOST_BRANCH: $BOOST_BRANCH
+          BOOST_GIT=https://github.com/${GITHUB_REPOSITORY/boost_install/boost}.git
+          echo BOOST_GIT: ${BOOST_GIT}
+          echo BOOST_BRANCH: ${BOOST_BRANCH}
           cd ..
-          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          git clone -b "${BOOST_BRANCH}" --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
           git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/${{matrix.lib}}
           python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" ${{matrix.lib}}
@@ -558,6 +560,8 @@ jobs:
           set BOOST_BRANCH=develop
           for /f %%i in ("%GITHUB_BASE_REF%") do if "%%~nxi" == "master" set BOOST_BRANCH=master
           for /f %%i in ("%GITHUB_BASE_REF%") do if "%%~nxi" == "modular" set BOOST_BRANCH=modular
+          set BOOST_GIT=https://github.com/%GITHUB_REPOSITORY:boost_install=boost%.git
+          echo BOOST_GIT: %BOOST_GIT%
           echo BOOST_BRANCH: %BOOST_BRANCH%
           cd ..
           git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
