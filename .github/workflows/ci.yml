@@ -370,7 +370,7 @@ jobs:
           echo BOOST_GIT: ${BOOST_GIT}
           echo BOOST_BRANCH: ${BOOST_BRANCH}
           cd ..
-          git clone -b "${BOOST_BRANCH}" --depth 1 https://github.com/boostorg/boost.git boost-root
+          git clone -b "${BOOST_BRANCH}" --depth 1 "${BOOST_GIT}" boost-root
           cd boost-root
           git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/${{matrix.lib}}
           python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" ${{matrix.lib}}
@@ -564,7 +564,7 @@ jobs:
           echo BOOST_GIT: %BOOST_GIT%
           echo BOOST_BRANCH: %BOOST_BRANCH%
           cd ..
-          git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
+          git clone -b %BOOST_BRANCH% --depth 1 %BOOST_GIT% boost-root
           cd boost-root
           git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/${{matrix.lib}}
           python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" ${{matrix.lib}}
