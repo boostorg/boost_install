@@ -1225,10 +1225,21 @@ rule generate-dependencies ( project name ? : property-set : sources * )
     local excluded-projects = $(project) [ $(project).find /boost ] ;
     for local p in [ get-dependency-projects $(sources) ] [ $(project).find /boost/headers ]
     {
+        local location = [ $(p).location ] ;
+        local stage-target ;
         if ! ( $(p) in $(excluded-projects) )
         {
-            stage-targets += [ $(p).find $(stage-or-install) : no-error ] ;
+            stage-target = [ $(p).find $(stage-or-install) : no-error ] ;
         }
+        if ! $(stage-target) && $(location:P)
+        {
+            local parent = [ $(project).find $(location:P) ] ;
+            if ! ( $(parent) in $(excluded-projects) )
+            {
+                stage-target = [ $(parent).find $(stage-or-install) : no-error ] ;
+            }
+        }
+        stage-targets += $(stage-target) ;
     }
     local props = [ $(property-set).propagated ] ;
     local result ;
