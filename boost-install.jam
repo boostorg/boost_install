@@ -1130,7 +1130,7 @@ rule install-or-stage-cmake-config ( name * : install-or-stage : includedir : li
 
         project.load [ path.make $(boost-install-dir) ] ;
 
-        install $(install-or-stage)-boost-config-version : /boost/tools/boost_install//BoostConfigVersion.cmake : <location>$(cmakedir)/Boost-$(BOOST_VERSION) ;
+        install $(install-or-stage)-boost-config-version : /boost/boost_install//BoostConfigVersion.cmake : <location>$(cmakedir)/Boost-$(BOOST_VERSION) ;
         $(p).mark-target-as-explicit $(install-or-stage)-boost-config-version ;
 
         # Target install/stage-cmake-config

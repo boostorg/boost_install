@@ -23,7 +23,9 @@ explicit
     [ install dist-cmake
         : BoostConfigVersion.cmake [ glob *.cmake ]
         : <location>$(DIST_DIR)/libs/cmake ]
-    [ alias dist : dist-cmake ]
     [ alias boost_install ]
-    [ alias all : boost_install dist ]
+    [ alias all : boost_install dist-cmake ]
     ;
+
+# Install distribution files/execs by default.
+alias dist : dist-cmake ;
