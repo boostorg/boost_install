@@ -3,7 +3,6 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 import modules ;
-import boostcpp ;
 import property-set ;
 import "class" : new ;
 import project ;
@@ -555,6 +554,8 @@ actions generate-cmake-variant-
 
 local rule tag ( name : type ? : property-set )
 {
+    import boostcpp ;
+
     .debug tag $(name) ;
 
     local link = [ $(property-set).get <link> ] ;
@@ -1161,7 +1162,7 @@ rule install-cmake-config ( name * )
 
 rule stage-cmake-config ( name * )
 {
-    local includedir = [ path.make [ modules.peek boostcpp : BOOST_ROOT ] ] ;
+    local includedir = [ boost-install-dirs.stage-includedir ] ;
     local libdir = [ boost-install-dirs.stage-libdir ] ;
     local cmakedir = $(libdir)/cmake ;
 
@@ -1257,6 +1258,8 @@ rule generate-dependencies ( project name ? : property-set : sources * )
 
 local rule install-stage-subdir ( properties * )
 {
+    import boostcpp ;
+
     local ps = [ property-set.create $(properties) ] ;
 
     local r = [ boostcpp.tag boost : STATIC_LIB : $(ps) ] ;
