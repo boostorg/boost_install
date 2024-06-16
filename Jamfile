@@ -5,6 +5,7 @@
 
 require-b2 5.1 ;
 
+import make ;
 import option ;
 import path ;
 
@@ -18,7 +19,7 @@ project /boost/boost_install ;
 
 # BoostConfigVersion.cmake
 
-generate BoostConfigVersion.cmake : : <generating-rule>@boost-install%generate-cmake-config-version <name>Boost <version>$(BOOST_VERSION) ;
+make BoostConfigVersion.cmake : : @boost-install%make-cmake-config-version : <version>$(BOOST_VERSION) ;
 explicit BoostConfigVersion.cmake ;
 
 explicit
