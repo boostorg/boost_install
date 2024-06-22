@@ -1215,6 +1215,30 @@ rule install-subdir ( properties * )
     return <location>(libdir)/$(r:E=) ;
 }
 
+rule os-dlldir ( properties * )
+{
+    local loc = [ property.select <location> : $(properties) ] ;
+    if $(loc)
+    {
+        return $(loc) ;
+    }
+
+    local dll-dir = [ property.select <install-dlldir> : $(properties) ] ;
+    if $(dlldir) || [ option.get dlldir ]
+    {
+        return <location>(dlldir) ;
+    }
+
+    local os = [ property.select <target-os> : $(properties) ] ;
+    os = $(os:G=) ;
+    if $(os:E=x) in windows cygwin
+    {
+        return <location>(bindir) ;
+    }
+
+    return <location>(dlldir) ;
+}
+
 rule boost-install ( libraries * )
 {
     .debug boost-install $(libraries) ;
@@ -1243,15 +1267,8 @@ rule boost-install ( libraries * )
     install install-libraries-static : $(libraries) : <location>(libdir) <install-dependencies>on <install-type>STATIC_LIB ;
     $(p).mark-target-as-explicit install-libraries-static ;
 
-    alias install-libraries-shared : install-libraries-shared- ;
-    alias install-libraries-shared : install-libraries-shared-cygwin : <target-os>cygwin ;
+    install install-libraries-shared : $(libraries) : <install-type>SHARED_LIB <install-type>PDB <install-dependencies>on <install-no-version-symlinks>on <conditional>@boost-install%os-dlldir ;
     $(p).mark-target-as-explicit install-libraries-shared ;
-
-    install install-libraries-shared- : $(libraries) : <location>(libdir) <install-type>SHARED_LIB <install-type>PDB <install-dependencies>on <install-no-version-symlinks>on ;
-    $(p).mark-target-as-explicit install-libraries-shared- ;
-
-    install install-libraries-shared-cygwin : $(libraries) : <location>(bindir) <install-type>SHARED_LIB <install-type>PDB <install-dependencies>on <install-no-version-symlinks>on ;
-    $(p).mark-target-as-explicit install-libraries-shared-cygwin ;
 
     install install-unprefixed-static : $(unprefixed) : <install-type>STATIC_LIB <conditional>@boost-install%install-subdir ;
     $(p).mark-target-as-explicit install-unprefixed-static ;
@@ -1304,16 +1321,23 @@ if [ MATCH --prefix=(.*) : [ modules.peek : ARGV ] ]
     option.set datadir : ;
     option.set datarootdir : ;
     option.set cmakedir : ;
+    option.set dlldir : ;
 }
 if [ MATCH --exec-prefix=(.*) : [ modules.peek : ARGV ] ]
 {
     option.set bindir : ;
     option.set libdir : ;
     option.set cmakedir : ;
+    option.set dlldir : ;
 }
 if [ MATCH --libdir-prefix=(.*) : [ modules.peek : ARGV ] ]
 {
     option.set cmakedir : ;
+    option.set dlldir : ;
+}
+if [ MATCH --bindir-prefix=(.*) : [ modules.peek : ARGV ] ]
+{
+    option.set dlldir : ;
 }
 if [ MATCH --dataroot-prefix=(.*) : [ modules.peek : ARGV ] ]
 {

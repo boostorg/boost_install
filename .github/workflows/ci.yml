@@ -585,7 +585,7 @@ jobs:
           cd tools\boost_install\test\${{matrix.lib}}
           mkdir __build__ && cd __build__
           cmake -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\..\.local -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ${{matrix.copts}} ..
-          PATH %PATH%;%GITHUB_WORKSPACE%\..\.local\lib;%GITHUB_WORKSPACE%\..\boost-root\stage\lib
+          PATH %PATH%;%GITHUB_WORKSPACE%\..\.local\bin;%GITHUB_WORKSPACE%\..\boost-root\stage\bin
           cmake --build . --config Debug && cmake --build . --config Debug --target check
           cmake --build . --config Release && cmake --build . --config Release --target check
           cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
