@@ -1184,7 +1184,7 @@ rule generate-dependencies ( project name ? : property-set : sources * )
         }
         if ! $(stage-target) && $(location:P)
         {
-            local parent = [ $(project).find $(location:P) ] ;
+            local parent = [ $(project).find $(location:P) : no-error ] ;
             if ! ( $(parent) in $(excluded-projects) )
             {
                 stage-target = [ $(parent).find $(stage-or-install) : no-error ] ;
