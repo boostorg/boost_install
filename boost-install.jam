@@ -1060,7 +1060,7 @@ rule install-or-stage-cmake-config ( name * : install-or-stage )
         if $(install-or-stage) = stage
         {
             local libdir = [ boost-install-dirs.stage-libdir ] ;
-            local includedir = [ path.make [ modules.peek boostcpp : BOOST_ROOT ] ] ;
+            local includedir = [ boost-install-dirs.stage-includedir ] ;
             reqs = <install-libdir>$(libdir) <install-includedir>$(includedir) ;
         }
         else
