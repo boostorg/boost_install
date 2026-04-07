@@ -58,6 +58,13 @@ rule stage-libdir
     }
 }
 
+# stage-bindir
+
+rule stage-bindir
+{
+    return [ stage-libdir ] ;
+}
+
 # stage-includedir
 
 rule stage-includedir
