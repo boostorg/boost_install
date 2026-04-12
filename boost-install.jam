@@ -1063,11 +1063,13 @@ rule install-or-stage-cmake-config ( name * : install-or-stage )
     else
     {
         local reqs ;
+
         if $(install-or-stage) = stage
         {
             local libdir = [ boost-install-dirs.stage-libdir ] ;
             local includedir = [ boost-install-dirs.stage-includedir ] ;
-            reqs = <install-libdir>$(libdir) <install-includedir>$(includedir) ;
+
+            reqs = <install-libdir>$(libdir) <install-dlldir>$(libdir) <install-includedir>$(includedir) ;
         }
         else
         {
@@ -1297,7 +1299,7 @@ rule boost-install ( libraries * )
     if ! [ $(p).has-alternative-for-target stage ]
     {
         local stage-libdir = [ boost-install-dirs.stage-libdir ] ;
-        local reqs = <install-libdir>$(stage-libdir) ;
+        local reqs = <install-libdir>$(stage-libdir) <install-dlldir>$(stage-libdir) ;
 
         stage-cmake-config $(libraries) ;
 
