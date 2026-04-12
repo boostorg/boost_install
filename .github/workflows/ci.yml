@@ -157,6 +157,20 @@ jobs:
             copts: -DBoost_USE_MULTITHREADED=OFF
             os: ubuntu-latest
 
+          # libdir, default cmakedir
+
+          - lib: filesystem
+            bopts: --libdir=$HOME/install-libdir install
+            copts: -DBoost_ROOT=$HOME/install-libdir/cmake
+            os: ubuntu-latest
+
+          # libdir, cmakedir
+
+          - lib: filesystem
+            bopts: --libdir=$HOME/install-libdir --cmakedir=$HOME/install-cmakedir install
+            copts: -DBoost_ROOT=$HOME/install-cmakedir
+            os: ubuntu-latest
+
           # staged
 
           - lib: filesystem
@@ -412,6 +426,16 @@ jobs:
             copts: -DBoost_USE_STATIC_LIBS=ON
             os: windows-latest
 
+          - lib: filesystem
+            bopts: --libdir=%GITHUB_WORKSPACE%\..\libdir install
+            copts: -DBoost_ROOT=%GITHUB_WORKSPACE%\..\libdir\cmake
+            os: windows-latest
+
+          - lib: filesystem
+            bopts: --libdir=%GITHUB_WORKSPACE%\..\libdir --cmakedir=%GITHUB_WORKSPACE%\..\cmakedir install
+            copts: -DBoost_ROOT=%GITHUB_WORKSPACE%\..\cmakedir
+            os: windows-latest
+
           # stage
 
           - lib: filesystem
@@ -437,6 +461,16 @@ jobs:
           - lib: filesystem
             bopts: link=static,shared stage
             copts: -DUSE_STAGED_BOOST=ON -DBoost_USE_STATIC_LIBS=ON
+            os: windows-latest
+
+          - lib: filesystem
+            bopts: --stagedir=stage64-msvc stage
+            copts: -DUSE_STAGED_BOOST=ON -DBoost_ROOT=%GITHUB_WORKSPACE%\..\boost-root\stage64-msvc\lib\cmake
+            os: windows-latest
+
+          - lib: filesystem
+            bopts: --stage-libdir=lib64-msvc stage
+            copts: -DUSE_STAGED_BOOST=ON -DBoost_ROOT=%GITHUB_WORKSPACE%\..\boost-root\lib64-msvc\cmake
             os: windows-latest
 
           # mingw
