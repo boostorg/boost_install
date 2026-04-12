@@ -413,6 +413,12 @@ jobs:
             os: windows-latest
 
           - lib: filesystem
+            bopts: link=shared --dlldir=bin install
+            copts: -DBoost_USE_STATIC_LIBS=OFF
+            dlldir: bin
+            os: windows-latest
+
+          - lib: filesystem
             bopts: link=static,shared install
             os: windows-latest
 
@@ -606,7 +612,9 @@ jobs:
           cd tools\boost_install\test\${{matrix.lib}}
           mkdir __build__ && cd __build__
           cmake -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\..\.local -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ${{matrix.copts}} ..
-          PATH %PATH%;%GITHUB_WORKSPACE%\..\.local\lib;%GITHUB_WORKSPACE%\..\boost-root\stage\lib
+          set _DLLDIR=%GITHUB_WORKSPACE%\..\.local\lib
+          if not "${{matrix.dlldir}}" == "" set _DLLDIR=%GITHUB_WORKSPACE%\..\.local\${{matrix.dlldir}}
+          PATH %PATH%;%_DLLDIR%;%GITHUB_WORKSPACE%\..\boost-root\stage\lib
           cmake --build . --config Debug && cmake --build . --config Debug --target check
           cmake --build . --config Release && cmake --build . --config Release --target check
           cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
