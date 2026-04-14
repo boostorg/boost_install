@@ -173,7 +173,7 @@ test_script:
   - if NOT "%CMAKE_BUILD_TYPE%" == "" SET CMAKE_BUILD_TYPE=-DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%
   - PATH %PATH:C:\Program Files\Git\usr\bin;=%
   - cmake %GENERATOR% %GENERATOR_TOOLSET% -DUSE_BOOST_PACKAGE=%UBP% -DBoost_VERBOSE=ON %USE_PYTHON_VERSION% %USE_STATIC_LIBS% %BUILD_SHARED_LIBS% %CMAKE_CXX_COMPILER% %CMAKE_BUILD_TYPE% %CMAKE_INSTALL% ..
-  - PATH %PATH%;C:\projects\.local\lib;C:\projects\boost-root\stage\lib
+  - PATH %PATH%;C:\projects\.local\bin;C:\projects\boost-root\stage\lib
   - if NOT "%CMAKE_BUILD_TYPE%" == "" cmake --build . && cmake --build . --target check
   - if "%CMAKE_BUILD_TYPE%" == "" cmake --build . --config Debug && cmake --build . --config Debug --target check
   - if "%CMAKE_BUILD_TYPE%" == "" cmake --build . --config Release && cmake --build . --config Release --target check
