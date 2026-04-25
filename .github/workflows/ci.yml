@@ -689,3 +689,39 @@ jobs:
           cmake --build . --config Release && cmake --build . --config Release --target check
           cmake --build . --config MinSizeRel && cmake --build . --config MinSizeRel --target check
           cmake --build . --config RelWithDebInfo && cmake --build . --config RelWithDebInfo --target check
+
+  posix-check-installed-files:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Boost
+        run: |
+          echo GITHUB_BASE_REF: $GITHUB_BASE_REF
+          echo GITHUB_REF: $GITHUB_REF
+          REF=${GITHUB_BASE_REF:-$GITHUB_REF}
+          REF=${REF#refs/heads/}
+          echo REF: $REF
+          BOOST_BRANCH=develop && [ "$REF" == "master" ] && BOOST_BRANCH=master || true
+          echo BOOST_BRANCH: $BOOST_BRANCH
+          cd ..
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          git submodule update --init --jobs 3
+          rm -rf tools/boost_install/*
+          cp -r $GITHUB_WORKSPACE/* tools/boost_install
+          ./bootstrap.sh
+          ./b2 -j3 --prefix=$HOME/.local --with-headers install
+
+      - name: Check installed files
+        run: |
+          test -f ~/.local/share/boost_predef/build.jam
+          test -f ~/.local/lib/cmake/BoostDetectToolset-1.92.0.cmake
+          test -f ~/.local/lib/cmake/Boost-*/BoostConfig.cmake
+          test -f ~/.local/lib/cmake/Boost-*/BoostConfigVersion.cmake
+          test -f ~/.local/lib/cmake/boost_headers-*/boost_headers-config.cmake
+          test -f ~/.local/lib/cmake/boost_headers-*/boost_headers-config-version.cmake
+          test -f ~/.local/lib/cmake/boost_system-*/boost_system-config.cmake
+          test -f ~/.local/lib/cmake/boost_system-*/boost_system-config-version.cmake
