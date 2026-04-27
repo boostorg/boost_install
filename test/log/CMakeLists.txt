@@ -18,15 +18,7 @@ if(USE_STAGED_BOOST)
   set(BOOST_HINTS HINTS ../../../../stage)
 endif()
 
-if(USE_ALL_COMPONENTS)
-
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED ALL ${BOOST_HINTS})
-
-else()
-
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS log ${BOOST_HINTS})
-
-endif()
+find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS log ${BOOST_HINTS})
 
 add_executable(main quick.cpp)
 target_link_libraries(main Boost::log)

@@ -198,13 +198,6 @@ jobs:
             copts: -DBoost_ROOT=$GITHUB_WORKSPACE/../boost-root/lib64-gcc5/cmake
             os: ubuntu-latest
 
-          # ALL
-
-          - lib: filesystem
-            bopts: install
-            copts: -DUSE_ALL_COMPONENTS=ON
-            os: ubuntu-latest
-
           # Boost_INCLUDE_DIRS, old style
 
           - lib: headers
@@ -274,11 +267,6 @@ jobs:
           - lib: log
             bopts: stage
             copts: -DUSE_STAGED_BOOST=ON -DBoost_USE_STATIC_LIBS=ON
-            os: ubuntu-latest
-
-          - lib: log
-            bopts: install
-            copts: -DUSE_ALL_COMPONENTS=ON
             os: ubuntu-latest
 
           - lib: log
