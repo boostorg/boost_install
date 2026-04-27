@@ -746,11 +746,11 @@ jobs:
 
       - name: Check installed files
         run: |
-          file ~/.local/share/boost_predef/build.jam
-          file ~/.local/lib/cmake/BoostDetectToolset-*.cmake
-          file ~/.local/lib/cmake/Boost-*/BoostConfig.cmake
-          file ~/.local/lib/cmake/Boost-*/BoostConfigVersion.cmake
-          file ~/.local/lib/cmake/boost_headers-*/boost_headers-config.cmake
-          file ~/.local/lib/cmake/boost_headers-*/boost_headers-config-version.cmake
-          file ~/.local/lib/cmake/boost_system-*/boost_system-config.cmake
-          file ~/.local/lib/cmake/boost_system-*/boost_system-config-version.cmake
+          file -E ~/.local/share/boost_predef/build.jam
+          file -E ~/.local/lib/cmake/BoostDetectToolset-*.cmake
+          file -E ~/.local/lib/cmake/Boost-*/BoostConfig.cmake
+          file -E ~/.local/lib/cmake/Boost-*/BoostConfigVersion.cmake
+          file -E ~/.local/lib/cmake/boost_headers-*/boost_headers-config.cmake
+          file -E ~/.local/lib/cmake/boost_headers-*/boost_headers-config-version.cmake
+          file -E ~/.local/lib/cmake/boost_system-*/boost_system-config.cmake
+          file -E ~/.local/lib/cmake/boost_system-*/boost_system-config-version.cmake
