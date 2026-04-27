@@ -394,7 +394,7 @@ jobs:
           ./b2 -j3 --prefix=$HOME/.local --with-${{matrix.lib}} ${{matrix.bopts}}
           cd tools/boost_install/test/${{matrix.lib}}
           mkdir __build__ && cd __build__
-          cmake -DCMAKE_INSTALL_PREFIX=~/.local -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ${{matrix.copts}} ..
+          cmake -DCMAKE_INSTALL_PREFIX=~/.local -DBoost_VERBOSE=ON ${{matrix.copts}} ..
           VERBOSE=1 cmake --build .
           export LD_LIBRARY_PATH=$HOME/.local/lib:$GITHUB_WORKSPACE/../boost-root/stage/lib:$LD_LIBRARY_PATH
           cmake --build . --target check
@@ -637,7 +637,7 @@ jobs:
           b2 -j3 --prefix=%GITHUB_WORKSPACE%\..\.local --with-${{matrix.lib}} ${{matrix.bopts}}
           cd tools\boost_install\test\${{matrix.lib}}
           mkdir __build__ && cd __build__
-          cmake -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\..\.local -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ${{matrix.copts}} ..
+          cmake -DCMAKE_INSTALL_PREFIX=%GITHUB_WORKSPACE%\..\.local -DBoost_VERBOSE=ON ${{matrix.copts}} ..
           PATH %PATH%;%GITHUB_WORKSPACE%\..\.local\bin;%GITHUB_WORKSPACE%\..\boost-root\stage\lib
           cmake --build . --config Debug && cmake --build . --config Debug --target check
           cmake --build . --config Release && cmake --build . --config Release --target check
@@ -715,7 +715,7 @@ jobs:
           b2 -j3 --with-${{matrix.lib}} install
           cd tools\boost_install\test\${{matrix.lib}}
           mkdir __build__ && cd __build__
-          cmake -DCMAKE_INSTALL_PREFIX=C:\Boost -DUSE_BOOST_PACKAGE=1 -DBoost_VERBOSE=ON ..
+          cmake -DCMAKE_INSTALL_PREFIX=C:\Boost -DBoost_VERBOSE=ON ..
           PATH %PATH%;C:\Boost\bin
           cmake --build . --config Debug && cmake --build . --config Debug --target check
           cmake --build . --config Release && cmake --build . --config Release --target check
