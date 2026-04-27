@@ -18,16 +18,7 @@ if(USE_STAGED_BOOST)
   set(BOOST_HINTS HINTS ../../../../stage)
 endif()
 
-if(USE_BOOST_PACKAGE)
-
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS serialization wserialization ${BOOST_HINTS})
-
-else()
-
-  find_package(boost_serialization ${BOOST_VERSION} EXACT CONFIG REQUIRED ${BOOST_HINTS})
-  find_package(boost_wserialization ${BOOST_VERSION} EXACT CONFIG REQUIRED ${BOOST_HINTS})
-
-endif()
+find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS serialization wserialization ${BOOST_HINTS})
 
 add_executable(quick quick.cpp)
 target_link_libraries(quick Boost::serialization)

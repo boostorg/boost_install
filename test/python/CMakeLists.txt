@@ -32,15 +32,8 @@ else()
   # use the found Python version in case more than one Boost.Python is installed
   set(Boost_PYTHON_VERSION ${PYTHONLIBS_VERSION_STRING})
 
-  if(USE_BOOST_PACKAGE)
+  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS python ${BOOST_HINTS})
 
-    find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS python ${BOOST_HINTS})
-
-  else()
-
-    find_package(boost_python ${BOOST_VERSION} EXACT CONFIG REQUIRED ${BOOST_HINTS})
-
-  endif()
 endif()
 
 add_executable(main quick.cpp)

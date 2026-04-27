@@ -22,13 +22,9 @@ if(USE_ALL_COMPONENTS)
 
   find_package(Boost ${BOOST_VERSION} EXACT REQUIRED ALL ${BOOST_HINTS})
 
-elseif(USE_BOOST_PACKAGE)
+else
 
   find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS log ${BOOST_HINTS})
-
-else()
-
-  find_package(boost_log ${BOOST_VERSION} EXACT CONFIG REQUIRED ${BOOST_HINTS})
 
 endif()
 

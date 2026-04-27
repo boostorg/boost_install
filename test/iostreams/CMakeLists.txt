@@ -18,15 +18,7 @@ if(USE_STAGED_BOOST)
   set(BOOST_HINTS HINTS ../../../../stage)
 endif()
 
-if(USE_BOOST_PACKAGE)
-
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS iostreams ${BOOST_HINTS})
-
-else()
-
-  find_package(boost_iostreams ${BOOST_VERSION} EXACT CONFIG REQUIRED ${BOOST_HINTS})
-
-endif()
+find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS iostreams ${BOOST_HINTS})
 
 add_executable(test_gzip test_gzip.cpp)
 target_link_libraries(test_gzip Boost::iostreams)

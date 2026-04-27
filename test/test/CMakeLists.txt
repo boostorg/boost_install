@@ -18,16 +18,7 @@ if(USE_STAGED_BOOST)
   set(BOOST_HINTS HINTS ../../../../stage)
 endif()
 
-if(USE_BOOST_PACKAGE)
-
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS prg_exec_monitor unit_test_framework ${BOOST_HINTS})
-
-else()
-
-  find_package(boost_prg_exec_monitor ${BOOST_VERSION} EXACT CONFIG REQUIRED ${BOOST_HINTS})
-  find_package(boost_unit_test_framework ${BOOST_VERSION} EXACT CONFIG REQUIRED ${BOOST_HINTS})
-
-endif()
+find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS prg_exec_monitor unit_test_framework ${BOOST_HINTS})
 
 add_executable(test_mon test_mon.cpp)
 target_link_libraries(test_mon Boost::prg_exec_monitor)
