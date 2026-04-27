@@ -541,6 +541,10 @@ jobs:
             copts: -DBoost_USE_STATIC_LIBS=OFF
             os: windows-latest
 
+          - lib: program_options
+            bopts: install
+            os: windows-latest
+
           # b2 finds Python 3.12 (in PATH), but CMake finds Python 3.14
 
           # python=3.14 isn't tested because the test executable doesn't run
