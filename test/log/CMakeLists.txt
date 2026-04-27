@@ -22,7 +22,7 @@ if(USE_ALL_COMPONENTS)
 
   find_package(Boost ${BOOST_VERSION} EXACT REQUIRED ALL ${BOOST_HINTS})
 
-else
+else()
 
   find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS log ${BOOST_HINTS})
 

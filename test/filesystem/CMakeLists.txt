@@ -26,7 +26,7 @@ elseif(USE_ALL_COMPONENTS_CONFIG)
 
   find_package(Boost ${BOOST_VERSION} EXACT CONFIG REQUIRED ALL ${BOOST_HINTS})
 
-else
+else()
 
   find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS filesystem ${BOOST_HINTS})
 
