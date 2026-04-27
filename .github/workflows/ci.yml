@@ -722,7 +722,7 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install libopenmpi-dev libpython3-dev
 
-      - name: Install Boost
+      - name: Setup Boost
         run: |
           echo GITHUB_BASE_REF: $GITHUB_BASE_REF
           echo GITHUB_REF: $GITHUB_REF
@@ -738,6 +738,10 @@ jobs:
           rm -rf tools/boost_install/*
           cp -r $GITHUB_WORKSPACE/* tools/boost_install
           ./bootstrap.sh
+
+      - name: Install Boost --with-headers
+        run: |
+          cd ../boost-root
           ./b2 -j3 --prefix=$HOME/.local --with-headers install
 
       - name: Test installed headers
@@ -752,5 +756,13 @@ jobs:
           file -E ~/.local/lib/cmake/Boost-*/BoostConfigVersion.cmake
           file -E ~/.local/lib/cmake/boost_headers-*/boost_headers-config.cmake
           file -E ~/.local/lib/cmake/boost_headers-*/boost_headers-config-version.cmake
+
+      - name: Install Boost --with-system
+        run: |
+          cd ../boost-root
+          ./b2 -j3 --prefix=$HOME/.local --with-system install
+
+      - name: Check installed files for System
+        run: |
           file -E ~/.local/lib/cmake/boost_system-*/boost_system-config.cmake
           file -E ~/.local/lib/cmake/boost_system-*/boost_system-config-version.cmake
