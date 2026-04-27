@@ -18,18 +18,10 @@ if(USE_STAGED_BOOST)
   set(BOOST_HINTS HINTS ../../../../stage)
 endif()
 
-# System is header-only in b2 starting from 1.89, so there's no `system` component anymore
-
-find_package(Boost ${BOOST_VERSION} EXACT REQUIRED OPTIONAL_COMPONENTS system ${BOOST_HINTS})
-
-# Using `include_directories`, `link_directories`, `link_libraries`
-# is bad practice, only done here for testing purposes.
-
-include_directories(${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-link_libraries(${Boost_LIBRARIES})
+find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS system ${BOOST_HINTS})
 
 add_executable(main quick.cpp)
+target_link_libraries(main Boost::system Boost::headers)
 
 enable_testing()
 add_custom_target(check VERBATIM COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --no-tests=error -C $<CONFIG>)
