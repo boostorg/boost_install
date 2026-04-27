@@ -230,6 +230,10 @@ jobs:
             bopts: install
             os: ubuntu-latest
 
+          - lib: date_time
+            bopts: install
+            os: ubuntu-latest
+
           - lib: iostreams
             bopts: install
             os: ubuntu-latest
@@ -332,6 +336,10 @@ jobs:
             os: ubuntu-latest
 
           - lib: serialization
+            bopts: install
+            os: ubuntu-latest
+
+          - lib: system
             bopts: install
             os: ubuntu-latest
 
@@ -499,6 +507,22 @@ jobs:
             bopts: install
             os: windows-latest
 
+          - lib: atomic
+            bopts: install
+            os: windows-latest
+
+          - lib: chrono
+            bopts: install
+            os: windows-latest
+
+          - lib: container
+            bopts: install
+            os: windows-latest
+
+          - lib: date_time
+            bopts: install
+            os: windows-latest
+
           - lib: iostreams
             bopts: install
             os: windows-latest
@@ -533,6 +557,10 @@ jobs:
             os: windows-2025
 
           - lib: serialization
+            bopts: install
+            os: windows-latest
+
+          - lib: system
             bopts: install
             os: windows-latest
 
