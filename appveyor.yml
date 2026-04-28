@@ -12,7 +12,7 @@ branches:
     - develop
     - /feature\/.*/
 
-image: Visual Studio 2017
+image: Visual Studio 2019
 
 environment:
   matrix:
@@ -21,7 +21,6 @@ environment:
     GENERATOR: Ninja
     CMAKE_CXX_COMPILER: clang-cl
     CMAKE_BUILD_TYPE: RelWithDebInfo
-    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
     SETUP_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
 
   - LIB: filesystem
@@ -36,95 +35,8 @@ environment:
     PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
     TOOLSET: gcc
 
-  - LIB: filesystem
-    TOOLSET: msvc-14.1
-
-  - LIB: filesystem
-    LAYOUT: tagged
-    TOOLSET: msvc-14.0
-
-  - LIB: filesystem
-    TOOLSET: msvc-14.1
-    STAGE: 1
-
-  - LIB: filesystem
-    B2_LINK: shared
-    USE_STATIC_LIBS: OFF
-    TOOLSET: msvc-14.1
-
-  - LIB: filesystem
-    B2_LINK: static,shared
-    TOOLSET: msvc-14.1
-
-  - LIB: filesystem
-    B2_LINK: static,shared
-    USE_STATIC_LIBS: OFF
-    TOOLSET: msvc-14.1
-
-  - LIB: filesystem
-    STAGE: 1
-    B2_LINK: shared
-    USE_STATIC_LIBS: OFF
-    TOOLSET: msvc-14.1
-
-  - LIB: filesystem
-    STAGE: 1
-    B2_LINK: static,shared
-    TOOLSET: msvc-14.1
-
-  - LIB: filesystem
-    STAGE: 1
-    B2_LINK: static,shared
-    USE_STATIC_LIBS: OFF
-    TOOLSET: msvc-14.1
-
-  - LIB: headers
-    TOOLSET: msvc-14.1
-
-  - LIB: iostreams
-    TOOLSET: msvc-14.1
-
-  - LIB: iostreams
-    TOOLSET: msvc-14.1
-    STAGE: 1
-
   - LIB: log
-    TOOLSET: msvc-14.1
-
-  - LIB: python
-    TOOLSET: msvc-14.1
-    PYTHON: 2.7,3.6,3.7
-    USE_PYTHON_VERSION: 2.7
-
-  - LIB: serialization
-    TOOLSET: msvc-14.1
-
-  - LIB: random
-    TOOLSET: msvc-14.1
-
-  - LIB: random
-    B2_LINK: shared
-    USE_STATIC_LIBS: OFF
-    TOOLSET: msvc-14.1
-
-  - LIB: random
-    BUILD_SHARED_LIBS: ON
-    TOOLSET: msvc-14.1
-
-  - LIB: random
-    B2_LINK: shared
-    USE_STATIC_LIBS: OFF
-    BUILD_SHARED_LIBS: ON
-    TOOLSET: msvc-14.1
-
-  - LIB: regex
-    TOOLSET: msvc-14.1
-
-  - LIB: test
-    TOOLSET: msvc-14.1
-
-  - LIB: thread
-    TOOLSET: msvc-14.1
+    TOOLSET: msvc
 
 install:
   - set BOOST_BRANCH=develop
