@@ -1,4 +1,4 @@
-# Copyright 2018, 2019 Peter Dimov
+# Copyright 2018, 2019, 2026 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -11,6 +11,8 @@ endif()
 project(CmakeConfigComponentTest LANGUAGES CXX)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../BoostVersion.cmake)
+
+string(MAKE_C_IDENTIFIER "${COMPONENT}" COMPONENT) # numeric/conversion -> numeric_conversion
 
 find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS ${COMPONENT})
 
