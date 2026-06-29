@@ -290,10 +290,10 @@ multi_array
 multi_index
 mysql
 # nowide
-# numeric/conversion
-# numeric/interval
-# numeric/odeint
-# numeric/ublas
+numeric_conversion
+numeric_interval
+numeric_odeint
+numeric_ublas
 openmethod
 optional
 outcome
