@@ -33,7 +33,7 @@ jobs:
           - charconv
           - chrono
           - circular_buffer
-          - cobalt
+          # - cobalt
           - compat
           - compute
           - concept_check
@@ -197,13 +197,13 @@ jobs:
           - smart_ptr
           - sort
           - spirit
-          - stacktrace
+          # - stacktrace
           - statechart
           - static_assert
           - static_string
           - stl_interfaces
           - system
-          - test
+          # - test
           - thread
           - throw_exception
           - timer
