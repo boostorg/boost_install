@@ -159,6 +159,19 @@ macro(boost_find_component comp required quiet)
 
 endmacro()
 
+macro(boost_find_hdronly_component comp required quiet)
+
+  if(NOT TARGET Boost::${comp})
+
+    add_library(Boost::${comp} INTERFACE IMPORTED)
+    set_property(TARGET Boost::${comp} APPEND PROPERTY INTERFACE_LINK_LIBRARIES Boost::headers)
+
+  endif()
+
+  set(Boost_${comp}_FOUND TRUE)
+
+endmacro()
+
 # Find boost_headers
 
 boost_find_component(headers 1 0)
@@ -184,6 +197,170 @@ set(Boost_VERSION_MACRO ${Boost_VERSION_MAJOR}0${Boost_VERSION_MINOR}0${Boost_VE
 get_target_property(Boost_INCLUDE_DIRS Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
 set(Boost_LIBRARIES "")
 
+# Header-only libraries
+
+set(__boost_hdronly_libraries
+
+accumulators
+algorithm
+align
+any
+array
+asio
+assert
+assign
+# atomic
+beast
+bimap
+bind
+bloom
+callable_traits
+# charconv
+# chrono
+circular_buffer
+# cobalt
+compat
+compute
+concept_check
+config
+# container
+container_hash
+# context
+# contract
+conversion
+convert
+core
+# coroutine
+coroutine2
+crc
+# date_time
+decimal
+describe
+detail
+dll
+dynamic_bitset
+endian
+# exception
+# fiber
+# filesystem
+flyweight
+foreach
+format
+function
+functional
+function_types
+fusion
+geometry
+gil
+# graph
+# graph_parallel
+hana
+hash2
+# headers
+heap
+histogram
+hof
+icl
+integer
+interprocess
+intrusive
+io
+# iostreams
+iterator
+# json
+lambda
+lambda2
+leaf
+lexical_cast
+# locale
+local_function
+lockfree
+# log
+logic
+# math
+metaparse
+move
+mp11
+# mpi
+mpl
+mqtt5
+msm
+multiprecision
+multi_array
+multi_index
+mysql
+# nowide
+# numeric/conversion
+# numeric/interval
+# numeric/odeint
+# numeric/ublas
+openmethod
+optional
+outcome
+parameter
+parameter_python
+parser
+pfr
+phoenix
+polygon
+poly_collection
+pool
+predef
+preprocessor
+# process
+# program_options
+property_map
+property_map_parallel
+property_tree
+proto
+ptr_container
+# python
+qvm
+# random
+range
+ratio
+rational
+redis
+# regex
+safe_numerics
+scope
+scope_exit
+# serialization
+signals2
+smart_ptr
+sort
+spirit
+# stacktrace
+statechart
+static_assert
+static_string
+stl_interfaces
+# system
+# test
+# thread
+throw_exception
+# timer
+tokenizer
+tti
+tuple
+typeof
+# type_erasure
+type_index
+type_traits
+units
+unordered
+# url
+utility
+uuid
+variant
+variant2
+vmd
+# wave
+winapi
+xpressive
+yap
+)
+
 # Save project's policies
 
 cmake_policy(PUSH)
@@ -193,7 +370,15 @@ cmake_policy(SET CMP0057 NEW) # if IN_LIST
 
 foreach(__boost_comp IN LISTS Boost_FIND_COMPONENTS)
 
-  boost_find_component(${__boost_comp} ${Boost_FIND_REQUIRED_${__boost_comp}} 0)
+  if(__boost_comp IN_LIST __boost_hdronly_libraries)
+
+    boost_find_hdronly_component(${__boost_comp} ${Boost_FIND_REQUIRED_${__boost_comp}} 0)
+
+  else()
+
+    boost_find_component(${__boost_comp} ${Boost_FIND_REQUIRED_${__boost_comp}} 0)
+
+  endif()
 
 endforeach()
 
