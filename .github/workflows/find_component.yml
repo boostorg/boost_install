@@ -110,6 +110,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install libbz2-dev libopenmpi-dev libpython3-dev
+
       - name: Setup Boost
         run: |
           REF=${GITHUB_BASE_REF:-$GITHUB_REF}
@@ -120,13 +125,27 @@ jobs:
           cd ..
           git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
-          git submodule update --init --jobs 3
+          git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/${{matrix.library}}
+          python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" ${{matrix.library}}
           rm -rf tools/boost_install/*
           cp -r $GITHUB_WORKSPACE/* tools/boost_install
+          ./bootstrap.sh
+          ./b2 -d0 headers
+
+      - name: Install Boost
+        run: |
+          cd ../boost-root
+          echo "using python ;" >> ~/user-config.jam
+          echo "using mpi ;" >> ~/user-config.jam
+          ./b2 -j3 --prefix=$HOME/.local install
 
       - name: Configure ${{matrix.library}}
         working-directory: ../boost-root
-        run: cmake -DCOMPONENT=${{matrix.library}} -B __build__
+        run: cmake -S tools/boost_install/test/component -B __build__ -DCMAKE_INSTALL_PREFIX=~/.local -DBoost_VERBOSE=ON -DCOMPONENT=${{matrix.library}}
+
+      - name: Build test
+        working-directory: ../boost-root
+        run: cmake --build __build__
 
       - name: Run test
         working-directory: ../boost-root
@@ -213,6 +232,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install libbz2-dev libopenmpi-dev libpython3-dev
+
       - name: Setup Boost
         run: |
           REF=${GITHUB_BASE_REF:-$GITHUB_REF}
@@ -223,13 +247,27 @@ jobs:
           cd ..
           git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
-          git submodule update --init --jobs 3
+          git submodule update --init --jobs 3 tools/boostdep libs/assert libs/config libs/core libs/${{matrix.library}}
+          python tools/boostdep/depinst/depinst.py -X test -g "--jobs 3" ${{matrix.library}}
           rm -rf tools/boost_install/*
           cp -r $GITHUB_WORKSPACE/* tools/boost_install
+          ./bootstrap.sh
+          ./b2 -d0 headers
+
+      - name: Install Boost
+        run: |
+          cd ../boost-root
+          echo "using python ;" >> ~/user-config.jam
+          echo "using mpi ;" >> ~/user-config.jam
+          ./b2 -j3 --prefix=$HOME/.local install
 
       - name: Configure ${{matrix.library}}
         working-directory: ../boost-root
-        run: cmake -DCOMPONENT=${{matrix.library}} -B __build__
+        run: cmake -S tools/boost_install/test/component -B __build__ -DCMAKE_INSTALL_PREFIX=~/.local -DBoost_VERBOSE=ON -DCOMPONENT=${{matrix.library}}
+
+      - name: Build test
+        working-directory: ../boost-root
+        run: cmake --build __build__
 
       - name: Run test
         working-directory: ../boost-root
