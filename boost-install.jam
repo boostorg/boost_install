@@ -61,61 +61,6 @@ local rule flags-to-vars ( ps )
 
 # generate-cmake-variant-
 
-local rule remap-library ( lib )
-{
-    switch $(lib)
-    {
-    case "python.lib" :
-
-        return ;
-
-    case "zlib" :
-
-        return "z" ;
-
-    case "bzip2" :
-
-        return "bz2" ;
-
-    case "icuuc" :
-
-        if [ modules.peek : ICU_ICUUC_NAME ]
-        {
-            return [ modules.peek : ICU_ICUUC_NAME ] ;
-        }
-        else
-        {
-            return "icuuc" ;
-        }
-
-    case "icudt" :
-
-        if [ modules.peek : ICU_ICUDT_NAME ]
-        {
-            return [ modules.peek : ICU_ICUDT_NAME ] ;
-        }
-        else
-        {
-            return "icudata" ;
-        }
-
-    case "icuin" :
-
-        if [ modules.peek : ICU_ICUIN_NAME ]
-        {
-            return [ modules.peek : ICU_ICUIN_NAME ] ;
-        }
-        else
-        {
-            return "icui18n" ;
-        }
-
-    case * :
-
-        return $(lib) ;
-    }
-}
-
 rule generate-cmake-variant- ( target : sources * : properties * )
 {
     .info generate-cmake-variant- $(target) ":" $(sources) ;
@@ -533,18 +478,85 @@ rule generate-cmake-variant- ( target : sources * : properties * )
     .info "  deps2=" $(deps2) ;
 
     local deps3 ;
+    local find-dep ;
+    local icu-components ;
 
     for local dep in $(deps2)
     {
-        deps3 += [ remap-library $(dep) ] ;
+        switch $(dep)
+        {
+            # Use proper targets and prepare find_dependency
+            case "icuuc" :
+                if [ modules.peek : ICU_ICUUC_NAME ]
+                {
+                    deps3 += [ modules.peek : ICU_ICUUC_NAME ] ;
+                }
+                else
+                {
+                    icu-components += "uc" ;
+                    deps3 += "ICU::uc" ;
+                }
+
+            case "icudt" :
+                if [ modules.peek : ICU_ICUDT_NAME ]
+                {
+                    deps3 += [ modules.peek : ICU_ICUDT_NAME ] ;
+                }
+                else
+                {
+                    icu-components += "data" ;
+                    deps3 += "ICU::data" ;
+                }
+
+            case "icuin" :
+                if [ modules.peek : ICU_ICUIN_NAME ]
+                {
+                    deps3 += [ modules.peek : ICU_ICUIN_NAME ] ;
+                }
+                else
+                {
+                    icu-components += "i18n" ;
+                    deps3 += "ICU::i18n" ;
+                }
+
+            case "iconv" :
+                find-dep += "find_dependency(Iconv)" ;
+                deps3 += "Iconv::Iconv" ;
+
+            case "zlib" :
+                find-dep += "find_dependency(ZLIB)" ;
+                deps3 += "ZLIB::ZLIB" ;
+
+            case "bzip2" :
+                find-dep += "find_dependency(BZip2)" ;
+                deps3 += "BZip2::BZip2" ;
+
+            case "python.lib" :
+
+            case * :
+                deps3 += $(dep) ;
+        }
+    }
+    if $(icu-components)
+    {
+        find-dep += "find_dependency(ICU COMPONENTS $(icu-components:J= ))" ;
     }
 
     .info "  deps3=" $(deps3) ;
+    .info "  icu-components=" $(icu-components) ;
+    .info "  find-dep=" $(find-dep) ;
 
-    if $(deps3) && $(link) = static
+
+    if $(deps3)
     {
+        if $(find-dep)
+        {
+            find-dep = "include(CMakeFindDependencyMacro)"  "$(find-dep)" ;
+        }
+
         print.text
 
+            $(find-dep)
             "if(CMAKE_CONFIGURATION_TYPES)"
             "  set_property(TARGET $(target) APPEND PROPERTY INTERFACE_LINK_LIBRARIES"
             "    \"$<$<CONFIG:$(variant)>:$(deps3:J=;)>\")"
